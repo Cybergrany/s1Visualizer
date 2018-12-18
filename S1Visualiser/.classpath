@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="TarsosDSP/TarsosDSP-latest.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/MarvinFramework"/>
+	<classpathentry kind="lib" path="lib/artoolkitplus-platform.jar"/>
+	<classpathentry kind="lib" path="lib/artoolkitplus-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/artoolkitplus.jar"/>
+	<classpathentry kind="lib" path="lib/ffmpeg-platform.jar"/>
+	<classpathentry kind="lib" path="lib/ffmpeg-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/ffmpeg.jar"/>
+	<classpathentry kind="lib" path="lib/flandmark-platform.jar"/>
+	<classpathentry kind="lib" path="lib/flandmark-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/flandmark.jar"/>
+	<classpathentry kind="lib" path="lib/flycapture-platform.jar"/>
+	<classpathentry kind="lib" path="lib/flycapture-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/flycapture.jar"/>
+	<classpathentry kind="lib" path="lib/javacpp.jar"/>
+	<classpathentry kind="lib" path="lib/javacv-platform.jar"/>
+	<classpathentry kind="lib" path="lib/javacv.jar" sourcepath="C:/Users/Owner/Documents/Java/Update/javacv-platform-1.4.3-src/javacv/src"/>
+	<classpathentry kind="lib" path="lib/leptonica-platform.jar"/>
+	<classpathentry kind="lib" path="lib/leptonica-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/leptonica.jar"/>
+	<classpathentry kind="lib" path="lib/libdc1394-platform.jar"/>
+	<classpathentry kind="lib" path="lib/libdc1394-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/libdc1394.jar"/>
+	<classpathentry kind="lib" path="lib/libfreenect-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/libfreenect.jar"/>
+	<classpathentry kind="lib" path="lib/libfreenect2-platform.jar"/>
+	<classpathentry kind="lib" path="lib/libfreenect2-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/libfreenect2.jar"/>
+	<classpathentry kind="lib" path="lib/librealsense-platform.jar"/>
+	<classpathentry kind="lib" path="lib/librealsense-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/librealsense.jar"/>
+	<classpathentry kind="lib" path="lib/opencv-platform.jar"/>
+	<classpathentry kind="lib" path="lib/opencv-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/opencv.jar"/>
+	<classpathentry kind="lib" path="lib/tesseract-platform.jar"/>
+	<classpathentry kind="lib" path="lib/tesseract-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/tesseract.jar"/>
+	<classpathentry kind="lib" path="lib/videoinput-platform.jar"/>
+	<classpathentry kind="lib" path="lib/videoinput-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="lib/videoinput.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MarvinPlugins"/>
+	<classpathentry kind="output" path="bin"/>
+	<referencedentry kind="lib" path="lib/opencv-3.1.0-1.3.jar" sourcepath="C:/Users/Owner/.m2/repository/org/bytedeco/javacpp-presets/opencv/3.1.0-1.3/opencv-3.1.0-1.3-sources.jar"/>
+</classpath>
