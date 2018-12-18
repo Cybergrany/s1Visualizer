@@ -1,4 +1,4 @@
-package com.davesone.vis.graphics.fx;
+package com.davesone.vis.video.plugins;
 
 import java.io.File;
 import java.util.ArrayList;

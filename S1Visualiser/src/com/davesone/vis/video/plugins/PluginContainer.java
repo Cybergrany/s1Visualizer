@@ -1,4 +1,4 @@
-package com.davesone.vis.graphics.fx;
+package com.davesone.vis.video.plugins;
 
 import marvin.plugin.MarvinImagePlugin;
 
@@ -6,7 +6,7 @@ public class PluginContainer {
 	
 	private MarvinImagePlugin plugin;
 	
-	private boolean loaded = false;
+	private boolean hasAttributesPanel = false;
 	
 	private int args;
 	
@@ -15,16 +15,23 @@ public class PluginContainer {
 	
 	public PluginContainer(MarvinImagePlugin p, String name) {
 		plugin = p;
+		try {
+			if(p.getAttributesPanel()!=null) {
+				hasAttributesPanel = true;
+			}
+		}catch (NullPointerException e) {}
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
+	public boolean hasAttributesPanel() {
+		return hasAttributesPanel;
+	}
+	
 	public MarvinImagePlugin getPlugin() {
-		if (loaded)
-			return plugin;
-		return null;
+		return plugin;
 	}
 	
 	public int args() {

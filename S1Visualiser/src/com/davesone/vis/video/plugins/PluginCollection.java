@@ -1,4 +1,4 @@
-package com.davesone.vis.graphics.fx;
+package com.davesone.vis.video.plugins;
 
 import java.awt.Color;
 import java.util.List;

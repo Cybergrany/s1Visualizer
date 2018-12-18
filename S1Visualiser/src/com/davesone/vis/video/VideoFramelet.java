@@ -1,6 +1,6 @@
 package com.davesone.vis.video;
 
-import static com.davesone.vis.graphics.fx.PluginCollection.scale;
+import static com.davesone.vis.video.plugins.PluginCollection.scale;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
