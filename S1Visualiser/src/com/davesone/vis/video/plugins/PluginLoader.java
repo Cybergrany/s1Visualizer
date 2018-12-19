@@ -32,10 +32,6 @@ public class PluginLoader {
 		Debug.printMessage("Total " + plugins.size() + " plugins loaded");
 	}
 	
-	public static void main(String[]args) {
-		new PluginLoader();
-	}
-	
 	/**
 	 * Slightly modified from MarvinPluginLoader
 	 * @return

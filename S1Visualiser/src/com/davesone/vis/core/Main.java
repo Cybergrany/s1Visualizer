@@ -1,8 +1,5 @@
 package com.davesone.vis.core;
 
-import java.util.ArrayList;
-
-import com.davesone.vis.video.plugins.PluginContainer;
 import com.davesone.vis.video.plugins.PluginLoader;
 
 public class Main {
@@ -24,9 +21,5 @@ public class Main {
 	
 	public static Main getInstance() {
 		return instance;
-	}
-	
-	public ArrayList<PluginContainer> getPlugins(){
-		return pluginLoader.plugins;
 	}
 }

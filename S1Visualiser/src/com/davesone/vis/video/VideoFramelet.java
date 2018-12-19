@@ -5,6 +5,8 @@ import static com.davesone.vis.video.plugins.PluginCollection.scale;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
+import com.davesone.vis.video.plugins.PluginContainer;
+
 import marvin.image.MarvinImage;
 import marvin.plugin.MarvinImagePlugin;
 import marvin.util.MarvinPluginLoader;
@@ -17,13 +19,13 @@ import marvin.video.MarvinVideoInterfaceException;
  * @author Owner
  *
  */
-public class VideoFramelet {
+public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject{
 	
 	public boolean isVisible;
 	
 	private MarvinImage image;
 	private CustomMarvinJavaCVAdapter adapter;
-	private ArrayList<MarvinImagePlugin> plugins;
+	private ArrayList<PluginContainer> plugins;
 	
 	private int xPos, yPos, width, origW, height, origH;
 	
@@ -38,21 +40,21 @@ public class VideoFramelet {
 		isVisible = true;
 	}
 	
+	public void tick() {
+		
+	}
+	
 	public void render() {
 		try {
 			scale(adapter.getFrame(), image, width, height);
 			if(!plugins.isEmpty()) {//Apply any marvin rendering effects
-				for(MarvinImagePlugin p : plugins) {
-					p.process(image.clone(), image);
+				for(PluginContainer p : plugins) {
+					p.getPlugin().process(image.clone(), image);
 				}
 			}
 		} catch (MarvinVideoInterfaceException e) {
 			System.err.println("Error rendering framelet (VideoFramelet.java)");//TODO handle
 		}
-	}
-	
-	public void addMarvinPlugin(String path) {
-		plugins.add(MarvinPluginLoader.loadImagePlugin(path));
 	}
 	
 	public void setVisible(boolean tof) {
@@ -92,6 +94,32 @@ public class VideoFramelet {
 	
 	public MarvinImage getImage() {
 		return image;
+	}
+
+	@Override
+	public ArrayList<PluginContainer> getPlugins() {
+		return plugins;
+	}
+
+	@Override
+	public void addPlugin(PluginContainer p) {
+		plugins.add(p);
+		
+	}
+
+	@Override
+	public void removePlugin(PluginContainer p) {
+		plugins.remove(p);
+	}
+
+	@Override
+	public int getWidth() {
+		return width;
+	}
+
+	@Override
+	public int getHeight() {
+		return height;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.davesone.vis.functest;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 
 import javax.swing.JFrame;
 
@@ -21,20 +22,18 @@ public class GraphicsT extends JFrame implements Runnable{
 		panel = new MarvinPanelCanvas(getWidth(), getHeight());
 		
 		try {
-			vf = new VideoFramelet("./res/driving.mp4");
-			vf2 = new VideoFramelet("./res/driving.mp4");
+			vf = new VideoFramelet("./res/Realness.mp4");
+			vf2 = new VideoFramelet("./res/Realness.mp4");
 		} catch (MarvinVideoInterfaceException e) {
 			e.printStackTrace();
 		}
 		
-		vf.setPosition(200, 100);
-//		vf2.setPosition(300, 300);
+		vf.setPosition(0, 0);
+		vf2.setPosition(300, 300);
 //		vf2.resize(50);
-		vf.resize(200);
 		
 		panel.addFramelet(vf);
-//		panel.addFramelet(vf2);
-		
+		panel.addFramelet(vf2);
 		setLayout(new BorderLayout());
 		add(panel, BorderLayout.CENTER);
 		

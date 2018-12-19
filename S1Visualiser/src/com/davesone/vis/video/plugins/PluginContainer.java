@@ -15,6 +15,7 @@ public class PluginContainer {
 	
 	public PluginContainer(MarvinImagePlugin p, String name) {
 		plugin = p;
+		this.name = name;
 		try {
 			if(p.getAttributesPanel()!=null) {
 				hasAttributesPanel = true;

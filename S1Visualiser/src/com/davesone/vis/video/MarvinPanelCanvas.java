@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import com.davesone.vis.video.plugins.PluginContainer;
+
 import marvin.gui.MarvinImagePanel;
 import marvin.image.MarvinImage;
 import marvin.video.MarvinVideoInterfaceException;
@@ -11,10 +13,11 @@ import marvin.video.MarvinVideoInterfaceException;
 /**
  * A canvas onto which marvinimages can be added in the form of dynamic
  * frames. Extends MarvinImagePanel, which extends JPanel
+ * Important note: this is a canvas, not a dynamic object itself
  * @author Owner
  *
  */
-public class MarvinPanelCanvas extends MarvinImagePanel{
+public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVideoObject{
 	
 	private MarvinImage masterImage, bgImage;
 	
@@ -27,9 +30,17 @@ public class MarvinPanelCanvas extends MarvinImagePanel{
 		width = w; height = h;
 		masterImage = new MarvinImage(width, height);
 		bgImage = new MarvinImage(width, height);
-		setBackground(Color.BLACK);
+		
+		setBgColor(Color.BLACK);//TODO TEMP
+		
 		framelets = new ArrayList<>();
 		
+	}
+	
+	public void tick() {
+		for(VideoFramelet f: framelets) {
+			f.tick();
+		}
 	}
 	
 	public void render() {
@@ -38,7 +49,6 @@ public class MarvinPanelCanvas extends MarvinImagePanel{
 				f.render();
 				addFrameletToImage(f);
 				masterImage.update();
-//				validate();
 				repaint();
 			}
 		}
@@ -54,9 +64,6 @@ public class MarvinPanelCanvas extends MarvinImagePanel{
 		bgImage.update();
 	}
 	
-	/**
-	 * Add a framelet object without filter
-	 */
 	public void addFramelet(String filepath) {
 		try {
 			VideoFramelet f = new VideoFramelet(filepath);
@@ -71,11 +78,6 @@ public class MarvinPanelCanvas extends MarvinImagePanel{
 		framelets.add(f);
 	}
 	
-	public void addFramelet(String filepath, String marvinpluginpath) {
-		addFramelet(filepath);
-		framelets.get(framelets.size()-1).addMarvinPlugin(marvinpluginpath);//TODO check if that -1 is needed
-	}
-	
 	public void removeFramelet(VideoFramelet f) {
 		framelets.remove(f);
 	}
@@ -85,7 +87,9 @@ public class MarvinPanelCanvas extends MarvinImagePanel{
 		int y1 = (int) f.getSize().getHeight();
 		for(int x = f.getX(); x < f.getX() + x1; x++) {
 			for(int y = f.getY(); y <f.getY() + y1; y++) {
-				masterImage.setIntColor(x, y, f.getImage().getIntColor(x - f.getX(), y - f.getY()));				
+				if(x < getWidth() && y < getHeight() && x - f.getX() < x1 && y - f.getY() < y1) {
+					masterImage.setIntColor(x, y, f.getImage().getIntColor(x - f.getX(), y - f.getY()));
+				}
 			}
 		}
 	}
@@ -98,11 +102,5 @@ public class MarvinPanelCanvas extends MarvinImagePanel{
 			g.drawImage(bgImage.getBufferedImage(), 0, 0, this);
 			g.drawImage(masterImage.getBufferedImage(), 0,0,this);
 		}
-	}
-	
-	@Override
-	public void update(){
-		masterImage.update();
-		repaint();
 	}
 }

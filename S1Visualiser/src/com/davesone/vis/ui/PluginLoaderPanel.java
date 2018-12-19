@@ -1,11 +1,11 @@
 package com.davesone.vis.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -14,24 +14,30 @@ import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
 import com.davesone.vis.core.Main;
+import com.davesone.vis.video.PluginCompatible;
 import com.davesone.vis.video.plugins.PluginContainer;
+import com.davesone.vis.video.plugins.PluginLoader;
 
 public class PluginLoaderPanel extends JPanel{
 	
-	private ArrayList<PluginContainer> plugins;
+	private PluginLoader pLoader;
+	private PluginCompatible target;
 	
 	
-	public PluginLoaderPanel(int width, int height) {
+	public PluginLoaderPanel(int width, int height, PluginLoader loader, PluginCompatible obj) {
 		super(new BorderLayout());
-		JPanel buttonPanel = new JPanel(new GridLayout(0,1));
+		
+		target = obj;
+		pLoader = loader;
+		
+		JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
 		ButtonGroup group = new ButtonGroup();
-		
-		plugins = Main.getInstance().getPlugins();
-		
 		this.setBorder(new TitledBorder("Choose a plugin to apply: "));
 		
-		for(PluginContainer p : plugins) {
+		for(PluginContainer p : pLoader.plugins) {
 			JButton b = new JButton(p.getName());
+			b.setBackground(Color.BLUE);
+			b.setSize(60, 20);
 			buttonPanel.add(b);
 			group.add(b);
 			b.setActionCommand(p.getName());
@@ -48,8 +54,17 @@ public class PluginLoaderPanel extends JPanel{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
-			
+			for(PluginContainer p : pLoader.plugins) {
+				if(e.getActionCommand().equals(p.getName())) {
+					if(target.getPlugins().contains(p)) {
+						target.removePlugin(p);
+						((JButton)e.getSource()).setBackground(Color.BLUE);
+					}else {
+						target.addPlugin(p);
+						((JButton)e.getSource()).setBackground(Color.RED);
+					}
+				}
+			}
 		}
 	};
 }
