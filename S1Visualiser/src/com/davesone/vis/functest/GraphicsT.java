@@ -13,7 +13,7 @@ import marvin.video.MarvinVideoInterfaceException;
 public class GraphicsT extends JFrame implements Runnable{
 	
 	private MarvinPanelCanvas panel;
-	private VideoFramelet vf, vf2;
+	private VideoFramelet vf, vf2, vf3;
 	
 	public GraphicsT() {
 		super("test");
@@ -24,16 +24,22 @@ public class GraphicsT extends JFrame implements Runnable{
 		try {
 			vf = new VideoFramelet("./res/Realness.mp4");
 			vf2 = new VideoFramelet("./res/Realness.mp4");
+
+			vf3 = new VideoFramelet("./res/Realness.mp4");
 		} catch (MarvinVideoInterfaceException e) {
 			e.printStackTrace();
 		}
 		
 		vf.setPosition(0, 0);
 		vf2.setPosition(300, 300);
+		vf3.setPosition(600, 150);
+//		vf.resize(500);
+//		vf2.resize(120);
 //		vf2.resize(50);
 		
 		panel.addFramelet(vf);
 		panel.addFramelet(vf2);
+		panel.addFramelet(vf3);
 		setLayout(new BorderLayout());
 		add(panel, BorderLayout.CENTER);
 		

@@ -7,4 +7,5 @@ public class VideoPreviewPanel extends JPanel{
 	public VideoPreviewPanel (){
 		
 	}
+	
 }

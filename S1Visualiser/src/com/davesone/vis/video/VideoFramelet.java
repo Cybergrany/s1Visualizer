@@ -5,6 +5,7 @@ import static com.davesone.vis.video.plugins.PluginCollection.scale;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
+import com.davesone.vis.core.Debug;
 import com.davesone.vis.video.plugins.PluginContainer;
 
 import marvin.image.MarvinImage;
@@ -53,8 +54,23 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject{
 				}
 			}
 		} catch (MarvinVideoInterfaceException e) {
-			System.err.println("Error rendering framelet (VideoFramelet.java)");//TODO handle
+			Debug.printError("Error rendering framelet");//TODO handle
 		}
+	}
+	
+	/**
+	 * Returns true if a pixel intersects this framelet.
+	 * @param xi Ensure this is relative to main canvas
+	 * @param yi
+	 * @return
+	 */
+	public boolean intersects(int xi, int yi) {
+		int rX = getWidth() + getX(), rY = getHeight() + getY();
+		
+		if((xi < rX && yi < rY) & (xi > getX() && yi > getY()))
+			return true;
+		
+		return false;
 	}
 	
 	public void setVisible(boolean tof) {

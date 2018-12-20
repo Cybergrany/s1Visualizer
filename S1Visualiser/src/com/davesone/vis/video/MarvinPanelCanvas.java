@@ -44,12 +44,18 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 	}
 	
 	public void render() {
+		int i = 0;
 		for (VideoFramelet f : framelets) {
 			if(f.isVisible) {
 				f.render();
-				addFrameletToImage(f);
+				if(i == 0) {
+					addFrameletToImage(f, null);
+				}else {
+					addFrameletToImage(f, framelets.get(i-1));
+				}
 				masterImage.update();
 				repaint();
+				i++;
 			}
 		}
 	}
@@ -82,13 +88,19 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 		framelets.remove(f);
 	}
 	
-	private void addFrameletToImage(VideoFramelet f) {
+	private void addFrameletToImage(VideoFramelet f, VideoFramelet prevF) {
 		int x1 = (int) f.getSize().getWidth();
 		int y1 = (int) f.getSize().getHeight();
 		for(int x = f.getX(); x < f.getX() + x1; x++) {
 			for(int y = f.getY(); y <f.getY() + y1; y++) {
 				if(x < getWidth() && y < getHeight() && x - f.getX() < x1 && y - f.getY() < y1) {
-					masterImage.setIntColor(x, y, f.getImage().getIntColor(x - f.getX(), y - f.getY()));
+					if(prevF == null) {
+						masterImage.setIntColor(x, y, f.getImage().getIntColor(x - f.getX(), y - f.getY()));
+					}else {
+						if(!(prevF.intersects(x, y))) {
+							masterImage.setIntColor(x, y, f.getImage().getIntColor(x - f.getX(), y - f.getY()));
+						}
+					}
 				}
 			}
 		}

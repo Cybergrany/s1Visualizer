@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import com.davesone.vis.video.plugins.PluginContainer;
 
-import marvin.image.MarvinImage;
-
 /**
  * Denotes that plugins can be rendered
  * on this video object
