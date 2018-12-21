@@ -1,4 +1,4 @@
-package com.davesone.vis.ui;
+package com.davesone.vis.ui.frames;
 
 import javax.swing.JFrame;
 
@@ -13,8 +13,8 @@ public class VideoOutputControlFrame extends JFrame{
 	
 	private VideoOutputFrame outputFrame;
 	
-	public VideoOutputControlFrame() {
-		
+	public VideoOutputControlFrame(VideoOutputFrame vof) {
+		outputFrame = vof;
 	}
 
 }

@@ -130,6 +130,10 @@ public class CustomMarvinJavaCVAdapter implements MarvinVideoInterface{
 				}
 			}
 		}
+		
+		public FFmpegFrameGrabber getGrabber() {
+			return grabber;
+		}
 
 		@Override
 		public void connect(int deviceIndex) throws MarvinVideoInterfaceException {

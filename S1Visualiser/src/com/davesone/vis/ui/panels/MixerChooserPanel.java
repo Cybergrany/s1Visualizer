@@ -1,4 +1,4 @@
-package com.davesone.vis.ui;
+package com.davesone.vis.ui.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

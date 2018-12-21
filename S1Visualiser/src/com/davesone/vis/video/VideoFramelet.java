@@ -25,6 +25,7 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject{
 	public boolean isVisible;
 	
 	private MarvinImage image;
+	private MarvinImage[] preview;
 	private CustomMarvinJavaCVAdapter adapter;
 	private ArrayList<PluginContainer> plugins;
 	
@@ -37,6 +38,17 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject{
 		origW = width = adapter.getImageWidth(); origH = height = adapter.getImageHeight();
 		
 		image = adapter.getFrame();
+		
+		int framelength = adapter.getGrabber().getLengthInVideoFrames();
+		preview = new MarvinImage[3];
+		
+		//Setup previews
+		for(int i = 0; i < 3;i++) {
+			adapter.setFrameNumber(Math.round(framelength/(i+1)));
+			preview[i] = adapter.getFrame();
+		}
+		
+		adapter.setFrameNumber(0);
 		plugins = new ArrayList<>();//init arraylist
 		isVisible = true;
 	}
@@ -136,6 +148,10 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject{
 	@Override
 	public int getHeight() {
 		return height;
+	}
+	
+	public MarvinImage[] getPreviewImg() {
+		return preview;
 	}
 
 }

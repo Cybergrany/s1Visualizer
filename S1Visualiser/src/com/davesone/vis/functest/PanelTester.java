@@ -5,7 +5,7 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 
 import com.davesone.vis.core.Main;
-import com.davesone.vis.ui.PluginLoaderPanel;
+import com.davesone.vis.ui.panels.PluginLoaderPanel;
 import com.davesone.vis.video.plugins.PluginLoader;
 
 public class PanelTester extends JFrame{
