@@ -6,18 +6,20 @@ import javax.swing.JFrame;
 
 import com.davesone.vis.core.Main;
 import com.davesone.vis.ui.panels.PluginLoaderPanel;
+import com.davesone.vis.ui.panels.TimelinePanel;
 import com.davesone.vis.video.plugins.PluginLoader;
 
 public class PanelTester extends JFrame{
 	
 	public PanelTester() {
 		super("TEst");
-		setSize(100,50);
+		setSize(1000,700);
 		
-		PluginLoader pl = new PluginLoader();
+//		PluginLoader pl = new PluginLoader();
 		
 //		PluginLoaderPanel p = new PluginLoaderPanel(100, 20, pl);
 		
+		TimelinePanel p = new TimelinePanel(getWidth()/2, getHeight());
 		setLayout(new BorderLayout());
 		add(p);
 		

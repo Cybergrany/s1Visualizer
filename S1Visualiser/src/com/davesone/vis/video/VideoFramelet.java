@@ -22,6 +22,8 @@ import marvin.video.MarvinVideoInterfaceException;
  */
 public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject{
 	
+	final int previewSize = 3;
+	
 	public boolean isVisible;
 	
 	private MarvinImage image;
@@ -40,10 +42,10 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject{
 		image = adapter.getFrame();
 		
 		int framelength = adapter.getGrabber().getLengthInVideoFrames();
-		preview = new MarvinImage[3];
+		preview = new MarvinImage[previewSize];
 		
 		//Setup previews
-		for(int i = 0; i < 3;i++) {
+		for(int i = 0; i < previewSize;i++) {
 			adapter.setFrameNumber(Math.round(framelength/(i+1)));
 			preview[i] = adapter.getFrame();
 		}
