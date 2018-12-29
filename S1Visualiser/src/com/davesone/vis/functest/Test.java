@@ -13,9 +13,9 @@ import javax.swing.UIManager;
 
 import com.davesone.vis.audio.AudioProcessorHandler;
 import com.davesone.vis.audio.AudioStreamHandler;
-import com.davesone.vis.audio.OnsetDetect;
-import com.davesone.vis.audio.PercussionDetect;
 import com.davesone.vis.core.Debug;
+import com.davesone.vis.triggers.OnsetDetect;
+import com.davesone.vis.triggers.PercussionDetect;
 import com.davesone.vis.ui.panels.MixerChooserPanel;
 
 public class Test extends JFrame{

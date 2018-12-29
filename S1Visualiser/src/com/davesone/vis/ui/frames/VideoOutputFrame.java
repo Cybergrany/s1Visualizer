@@ -21,13 +21,17 @@ public class VideoOutputFrame extends JFrame{
 	
 	private boolean fullscreen = false;
 
+	/**
+	 * Remember to call manager.startThread(); to start the rendering
+	 * @param w
+	 * @param h
+	 */
 	public VideoOutputFrame(int w, int h) {
 		super("S1 Visualiser");
 		setSize(w, h);
 		
 		manager = new VideoManager();
 		manager.initThread(w, h);
-		manager.startThread();
 		
 		device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
 		

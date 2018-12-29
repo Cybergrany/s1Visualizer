@@ -12,8 +12,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 public class MainFrame extends JFrame {
-	
-	private 
+	 
 	/**
 	 * Launch the application.
 	 */
