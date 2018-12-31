@@ -1,5 +1,7 @@
 package com.davesone.vis.core;
 
+import java.util.ArrayList;
+
 import com.davesone.vis.triggers.TriggerThread;
 import com.davesone.vis.ui.frames.VideoOutputFrame;
 
@@ -12,6 +14,7 @@ public class ShowManager {
 	
 	private VideoOutputFrame showFrame;
 	private TriggerThread showTriggerThread;
+	private ArrayList<Scene> scenes;//List of all scenes
 	
 	public ShowManager() {
 		

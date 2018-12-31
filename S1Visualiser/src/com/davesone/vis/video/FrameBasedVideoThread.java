@@ -1,5 +1,7 @@
 package com.davesone.vis.video;
 
+import com.davesone.vis.core.Debug;
+
 public class FrameBasedVideoThread implements Runnable{
 	
 	private Thread mainThread;
@@ -35,7 +37,7 @@ public class FrameBasedVideoThread implements Runnable{
 				if (System.currentTimeMillis() - lastTimer >= 1000) {
 //					if(printFPS) {
 						//Print the current fps and tps if printFPS is true
-						System.out.printf("%d ticks, %d fps\n", ticks, fps);
+						Debug.printMessage("%d ticks, %d fps\n", ticks, fps);
 //					}
 					lastTimer = System.currentTimeMillis();
 					ticks = fps = 0;

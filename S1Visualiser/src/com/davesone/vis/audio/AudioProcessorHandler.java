@@ -68,7 +68,7 @@ public class AudioProcessorHandler implements AudioProcessor, Trigger{//TODO the
 		return this;
 	}
 	
-	public void changeSetting(int index, Object value) throws TriggerException{
+	public void changeSetting(int index, double value) throws TriggerException{
 		try {
 			settings.setSettingValue(index, value);
 			onSettingUpdate();

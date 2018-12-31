@@ -29,7 +29,7 @@ public interface Trigger {
 	 * Called to change a setting values. Calling code will check
 	 * string array of getSettings to find index
 	 */
-	public void changeSetting(int index, Object value) throws TriggerException;
+	public void changeSetting(int index, double value) throws TriggerException;
 	
 	/**
 	 * Called every time values need to be refreshed

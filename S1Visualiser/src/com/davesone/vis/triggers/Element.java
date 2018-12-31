@@ -3,7 +3,20 @@ package com.davesone.vis.triggers;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
-public interface Triggerable {
+/**
+ * Element- a display element which makes up a scene
+ * @author Owner
+ *
+ */
+public interface Element {
+	
+	/**
+	 * Type of triggerable, for sorting
+	 * objects into their respective places
+	 * in the render window
+	 */
+	public enum triggerFlavour {VIDEOFRAMELET};
+	public triggerFlavour getTriggerType();
 	
 	public Trigger getTrigger();
 	

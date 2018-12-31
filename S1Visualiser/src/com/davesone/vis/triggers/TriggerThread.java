@@ -12,13 +12,13 @@ public class TriggerThread implements Runnable{
 	
 	public boolean running;
 	private Thread tThread;
-	private ArrayList<Triggerable> triggerable;
+	private ArrayList<Element> triggerable;
 
 	/**
 	 * Init the thread, running must be set to true before thread will start
 	 * @param triggerableList
 	 */
-	public TriggerThread(ArrayList<Triggerable> triggerableList) {
+	public TriggerThread(ArrayList<Element> triggerableList) {
 		triggerable = triggerableList;
 		tThread = new Thread(this, "Trigger listening thread");
 	}
@@ -26,7 +26,7 @@ public class TriggerThread implements Runnable{
 	@Override
 	public void run() {//TODO this thread is not synced with video thread, so triggers might end up a bit funny in timing
 		while(running) {
-			for(Triggerable t : triggerable) {
+			for(Element t : triggerable) {
 				if(t.getTrigger().isTriggered()) {
 					t.getTriggerAction().onTrigger();
 					t.getTrigger().resetTrigger();
@@ -38,7 +38,7 @@ public class TriggerThread implements Runnable{
 	/**
 	 * Call when a change to the list of triggerable objects is needed
 	 */
-	public void updateTriggerableList(ArrayList<Triggerable> t) {
+	public void updateTriggerableList(ArrayList<Element> t) {
 		triggerable = t;
 	}
 	

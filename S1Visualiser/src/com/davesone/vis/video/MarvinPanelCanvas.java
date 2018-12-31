@@ -7,6 +7,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 
+import com.davesone.vis.core.Debug;
 import com.davesone.vis.video.plugins.PluginContainer;
 
 import marvin.gui.MarvinImagePanel;
@@ -23,6 +24,7 @@ import marvin.video.MarvinVideoInterfaceException;
 public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVideoObject, Runnable{
 	
 	private MarvinImage masterImage, bgImage;
+	private CustomMarvinJavaCVAdapter bgAdapter;
 	
 	private Thread frameletRenderThread;
 	
@@ -31,7 +33,7 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 	private ArrayList<VideoFramelet> framelets;
 	
 	private int width, height;
-	private boolean renderFramelets;
+	private boolean renderFramelets, bgisVideo = false;
 	
 	public MarvinPanelCanvas(int w, int h) {
 		super();
@@ -64,7 +66,14 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 	}
 	
 	public void render() {
-		
+		if(bgisVideo) {
+			try {
+				bgImage = bgAdapter.getFrame();
+				bgImage.update();
+			} catch (MarvinVideoInterfaceException e) {
+				Debug.printError("Canvas background failed to play");
+			}
+		}
 	}
 	
 	/**
@@ -95,7 +104,6 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 		width = w; height = h;
 		masterImage.setDimension(width, height);
 		bgImage.setDimension(width, height);
-		setBgColor(bgColor);
 		masterImage.updateColorArray();
 		masterImage.update();
 		bgImage.updateColorArray();
@@ -111,8 +119,14 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 	}
 	
 	public void setBgColor(Color c) {
-		bgImage.fillRect(0, 0, width, height, Color.BLACK);
+		bgisVideo = false;
+		bgImage.fillRect(0, 0, width, height, c);
 		bgImage.update();
+	}
+	
+	public void setBgVideo(String path) {
+		bgAdapter = new CustomMarvinJavaCVAdapter(path);
+		bgisVideo = true;
 	}
 	
 	public void addFramelet(String filepath) {

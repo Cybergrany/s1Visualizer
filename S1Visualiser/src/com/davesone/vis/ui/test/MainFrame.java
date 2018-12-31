@@ -1,18 +1,29 @@
 package com.davesone.vis.ui.test;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListModel;
+
+import com.davesone.vis.core.Scene;
+import javax.swing.ListSelectionModel;
 
 public class MainFrame extends JFrame {
-	 
+	
+	private DefaultListModel<String> sceneString;
+	private ArrayList<Scene> sceneList;
+
 	/**
 	 * Launch the application.
 	 */
@@ -33,10 +44,16 @@ public class MainFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public MainFrame() {
+		
+		//Init lists
+		sceneString = new DefaultListModel<String>();
+		sceneList = new ArrayList<Scene>();
+		JList sceneJlist = new JList(sceneString);
+		
 		setResizable(false);
 		setTitle("S1 VIZ");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 585, 430);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0};
 		gridBagLayout.rowHeights = new int[]{175, 0, 0};
@@ -58,14 +75,43 @@ public class MainFrame extends JFrame {
 		gbl_panel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
+		
+		//Delete and add buttons
+		JButton btnDeleteScene = new JButton("Delete Scene");
+		btnDeleteScene.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int index = sceneJlist.getSelectedIndex();
+				
+				sceneString.removeElementAt(index);
+				sceneList.remove(index);
+				
+				if(sceneList.size() == 0)
+					btnDeleteScene.setEnabled(false);
+			}
+		});
+		
 		JButton btnAddScene = new JButton("Add Scene");
+		btnAddScene.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int index = sceneJlist.getSelectedIndex();
+				
+				sceneList.add(new Scene());
+				sceneString.addElement("Scene " + index);
+				btnDeleteScene.setEnabled(true);
+			}
+		});
+		
 		GridBagConstraints gbc_btnAddScene = new GridBagConstraints();
 		gbc_btnAddScene.insets = new Insets(0, 0, 5, 5);
 		gbc_btnAddScene.gridx = 0;
 		gbc_btnAddScene.gridy = 0;
 		panel.add(btnAddScene, gbc_btnAddScene);
 		
-		JButton btnDeleteScene = new JButton("Delete Scene");
+		
 		GridBagConstraints gbc_btnDeleteScene = new GridBagConstraints();
 		gbc_btnDeleteScene.insets = new Insets(0, 0, 5, 5);
 		gbc_btnDeleteScene.gridx = 1;
@@ -79,14 +125,15 @@ public class MainFrame extends JFrame {
 		gbc_btnEditScene.gridy = 0;
 		panel.add(btnEditScene, gbc_btnEditScene);
 		
-		JList list = new JList();
-		GridBagConstraints gbc_list = new GridBagConstraints();
-		gbc_list.gridwidth = 3;
-		gbc_list.insets = new Insets(0, 0, 0, 5);
-		gbc_list.fill = GridBagConstraints.BOTH;
-		gbc_list.gridx = 0;
-		gbc_list.gridy = 1;
-		panel.add(list, gbc_list);
+		sceneJlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		GridBagConstraints gbc_Scenelist = new GridBagConstraints();
+		gbc_Scenelist.gridwidth = 3;
+		gbc_Scenelist.insets = new Insets(0, 0, 0, 5);
+		gbc_Scenelist.fill = GridBagConstraints.BOTH;
+		gbc_Scenelist.gridx = 0;
+		gbc_Scenelist.gridy = 1;
+		panel.add(sceneJlist, gbc_Scenelist);
 		
 		JPanel panel_1 = new JPanel();
 		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
@@ -122,13 +169,14 @@ public class MainFrame extends JFrame {
 		gbc_button_2.gridy = 0;
 		panel_1.add(button_2, gbc_button_2);
 		
-		JList list_1 = new JList();
-		GridBagConstraints gbc_list_1 = new GridBagConstraints();
-		gbc_list_1.gridwidth = 3;
-		gbc_list_1.fill = GridBagConstraints.BOTH;
-		gbc_list_1.insets = new Insets(0, 0, 0, 5);
-		gbc_list_1.gridx = 0;
-		gbc_list_1.gridy = 1;
-		panel_1.add(list_1, gbc_list_1);
+		JList ElementList = new JList();
+		ElementList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		GridBagConstraints gbc_ElementList = new GridBagConstraints();
+		gbc_ElementList.gridwidth = 3;
+		gbc_ElementList.fill = GridBagConstraints.BOTH;
+		gbc_ElementList.insets = new Insets(0, 0, 0, 5);
+		gbc_ElementList.gridx = 0;
+		gbc_ElementList.gridy = 1;
+		panel_1.add(ElementList, gbc_ElementList);
 	}
 }
