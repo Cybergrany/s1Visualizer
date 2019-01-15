@@ -44,6 +44,7 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 	public VideoFramelet() {
 		attributes = new MarvinAttributes();
 		attributes.set("path", "");
+		plugins = new ArrayList<>();//init arraylist
 	}
 	
 	@Override
@@ -80,7 +81,6 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 //		}
 //		
 		adapter.setFrameNumber(0);
-		plugins = new ArrayList<>();//init arraylist
 		isVisible = true;
 	}
 	

@@ -21,4 +21,5 @@ public class UIWrapperManager {
 		}
 		throw new IllegalArgumentException();
 	}
+	
 }

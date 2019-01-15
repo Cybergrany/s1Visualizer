@@ -2,6 +2,7 @@ package com.davesone.vis.ui;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,6 +10,7 @@ import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -18,14 +20,16 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 
+import org.marvinproject.image.test.plugin.Plugin;
+
 import com.davesone.vis.core.Scene;
 import com.davesone.vis.core.TextAndObjectList;
 import com.davesone.vis.core.UIWrapperManager;
+import com.davesone.vis.triggers.Element;
+import com.davesone.vis.video.PluginCompatible;
 import com.davesone.vis.video.plugins.PluginLoader;
 
 import marvin.gui.MarvinAttributesPanel;
-import java.awt.List;
-import java.awt.FlowLayout;
 
 /**
  * TODO This is in desperate need of cleanup
@@ -36,7 +40,7 @@ public class MainFrame extends JFrame {
 	
 	private TextAndObjectList<Scene> sceneList;
 	private Scene currentScene;//currently selected scene
-	private JList currentElementList;
+	private JList currentElementList, AppliedPluginList;
 	private MarvinAttributesPanel AttributePanel;
 	private PluginLoader availablePlugins;
 	
@@ -112,7 +116,6 @@ public class MainFrame extends JFrame {
 		sceneEditPanel.setLayout(gbl_sceneEditPanel);
 		
 		JButton btnDeleteScene = new JButton("Delete Scene");
-		btnDeleteScene.setEnabled(false);
 		
 		JButton btnAddScene = new JButton("Add Scene");
 		
@@ -187,12 +190,20 @@ public class MainFrame extends JFrame {
 		gbl_PluginPanelBorder.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		PluginPanelBorder.setLayout(gbl_PluginPanelBorder);
 		
-		JButton btnModifySettings = new JButton("Modify Settings");
-		GridBagConstraints gbc_btnModifySettings = new GridBagConstraints();
-		gbc_btnModifySettings.insets = new Insets(0, 0, 5, 5);
-		gbc_btnModifySettings.gridx = 0;
-		gbc_btnModifySettings.gridy = 0;
-		PluginPanelBorder.add(btnModifySettings, gbc_btnModifySettings);
+		JButton btnDeletePlugin = new JButton("Remove Plugin");
+		GridBagConstraints gbc_btnDeletePlugin = new GridBagConstraints();
+		gbc_btnDeletePlugin.anchor = GridBagConstraints.NORTH;
+		gbc_btnDeletePlugin.insets = new Insets(0, 0, 5, 5);
+		gbc_btnDeletePlugin.gridx = 0;
+		gbc_btnDeletePlugin.gridy = 0;
+		PluginPanelBorder.add(btnDeletePlugin, gbc_btnDeletePlugin);
+		
+		JButton btnModifySettings_1 = new JButton("Modify Settings");
+		GridBagConstraints gbc_btnModifySettings_1 = new GridBagConstraints();
+		gbc_btnModifySettings_1.insets = new Insets(0, 0, 5, 0);
+		gbc_btnModifySettings_1.gridx = 1;
+		gbc_btnModifySettings_1.gridy = 0;
+		PluginPanelBorder.add(btnModifySettings_1, gbc_btnModifySettings_1);
 		
 		Panel PluginPanel = new Panel();
 		
@@ -201,6 +212,9 @@ public class MainFrame extends JFrame {
 		gbc_PluginPanel.gridx = 0;
 		gbc_PluginPanel.gridy = 1;
 		PluginPanelBorder.add(PluginPanel, gbc_PluginPanel);
+		
+		AppliedPluginList = new JList();
+		PluginPanel.add(AppliedPluginList);
 		
 		JPanel PluginSettingsBorder = new JPanel();
 		PluginSettingsBorder.setBorder(new TitledBorder(null, "Plugin Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -252,7 +266,6 @@ public class MainFrame extends JFrame {
 		ElementEditPanel.setLayout(gbl_ElementEditPanel);
 		
 		JButton btnDeleteElement = new JButton("Delete Element");
-		btnDeleteElement.setEnabled(false);
 		
 		GridBagConstraints gbc_btnDeleteElement = new GridBagConstraints();
 		gbc_btnDeleteElement.insets = new Insets(0, 0, 5, 5);
@@ -340,11 +353,16 @@ public class MainFrame extends JFrame {
 		pluginscroller.setViewportView(PluginList);
 		
 		JButton btnAddToSelected = new JButton("Add");
-		btnAddToSelected.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		PluginListPanel.add(btnAddToSelected);
+		
+		
+		btnDeleteScene.setEnabled(false);
+		btnDeleteElement.setEnabled(false);
+		btnAddToSelected.setEnabled(false);
+		btnDeletePlugin.setEnabled(false);
+		btnModifySettings_1.setEnabled(false);
+		
+		
 		
 		//Add scene Listener
 		btnAddScene.addActionListener(new ActionListener() {
@@ -452,9 +470,29 @@ public class MainFrame extends JFrame {
 				int index = currentElementList.getSelectedIndex();
 				if(!unsavedChanges) {
 					
-					ElementAttributeEditor.remove(AttributePanel);;
+					ElementAttributeEditor.remove(AttributePanel);
 					
-					AttributePanel = currentScene.getElementList().getElement(index).getAttributesPanel();
+					Element currentElement = currentScene.getElementList().getElement(index);
+					
+					AttributePanel = currentElement.getAttributesPanel();
+					
+					if(currentElement instanceof PluginCompatible) {
+						DefaultListModel<String> m = new DefaultListModel<String>();
+							
+						for(int i = 0; i < ((PluginCompatible)currentElement).getPlugins().size(); i++) {
+							m.addElement(((PluginCompatible)currentElement).getPlugins().get(i).getName());
+						}
+						AppliedPluginList.setModel(m);
+						
+						if(m.size() > 0) {
+							btnDeletePlugin.setEnabled(true);
+							btnModifySettings_1.setEnabled(true);
+						}
+						
+						btnAddToSelected.setEnabled(true);
+					}else {//Ensure plugins only added to compatible elements
+						btnAddToSelected.setEnabled(false);
+					}
 					
 					ElementAttributeEditor.add(AttributePanel, gbc_AttributePanel);
 					validate();
@@ -470,7 +508,42 @@ public class MainFrame extends JFrame {
 					btnEditElement.setText("Edit Element");
 					btnEditElement.setBackground(Color.GREEN);
 					unsavedChanges = false;
+					
+					btnDeletePlugin.setEnabled(false);
+					btnModifySettings_1.setEnabled(false);
 				}
+			}
+		});
+		
+		//Add plugins button
+		btnAddToSelected.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int index = currentElementList.getSelectedIndex();
+				
+				//Button should only be activated if element is PC
+				//so casting without check should be safe
+				PluginCompatible currentElement = (PluginCompatible)currentScene.getElementList().getElement(index);
+				
+			}
+		});
+		
+		//Plugin settings modify
+		btnModifySettings_1.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		
+		//Plugin delete
+		btnDeletePlugin.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
 			}
 		});
 	}
