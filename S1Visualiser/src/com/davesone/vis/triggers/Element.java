@@ -3,6 +3,9 @@ package com.davesone.vis.triggers;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
+import marvin.gui.MarvinAttributesPanel;
+import marvin.util.MarvinAttributes;
+
 /**
  * Element- a display element which makes up a scene
  * @author Owner
@@ -11,12 +14,15 @@ import java.util.ArrayList;
 public interface Element {
 	
 	/**
-	 * Type of triggerable, for sorting
+	 * Type of element, for sorting
 	 * objects into their respective places
 	 * in the render window
 	 */
-	public enum triggerFlavour {VIDEOFRAMELET};
-	public triggerFlavour getTriggerType();
+	public enum elementFlavour {VIDEOFRAMELET};
+	public elementFlavour getElementType();
+	
+	public MarvinAttributesPanel getAttributesPanel();
+	public MarvinAttributes getAttributes();
 	
 	public Trigger getTrigger();
 	
@@ -43,11 +49,9 @@ public interface Element {
 	
 	/**
 	 * TODO these are to move to triggeraction classes
-	 * @param distance
-	 * @param timex
 	 */
-	public void move(int distance, int timex);//@param timex: How long to move distance
-	public void pulseSize(Dimension maxSize, Dimension minSize, int timex);
+//	public void move(int distance, int timex);//@param timex: How long to move distance
+//	public void pulseSize(Dimension maxSize, Dimension minSize, int timex);
 	
 	
 	

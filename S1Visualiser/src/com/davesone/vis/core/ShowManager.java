@@ -3,7 +3,7 @@ package com.davesone.vis.core;
 import java.util.ArrayList;
 
 import com.davesone.vis.triggers.TriggerThread;
-import com.davesone.vis.ui.frames.VideoOutputFrame;
+import com.davesone.vis.ui.VideoOutputFrame;
 
 /**
  * Class that handles all threads and programs needed to display the main show

@@ -1,4 +1,4 @@
-package com.davesone.vis.ui.panels;
+package com.davesone.vis.ui;
 
 import marvin.gui.MarvinImagePanel;
 

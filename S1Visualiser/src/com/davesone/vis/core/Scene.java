@@ -1,9 +1,6 @@
 package com.davesone.vis.core;
 
-import java.util.ArrayList;
-
 import com.davesone.vis.triggers.Element;
-import com.davesone.vis.video.VideoFramelet;
 
 /**
  * Contains a collection of elements, such as videoframelets,
@@ -13,17 +10,18 @@ import com.davesone.vis.video.VideoFramelet;
  */
 public class Scene {
 	
-	private ArrayList<Element> elements;
+	private TextAndObjectList<Element> elementList;
 	
 	public Scene() {
-		elements = new ArrayList<Element>();
+		elementList = new TextAndObjectList<Element>();
 	}
 	
-	public void addElement(Element t) {
-		elements.add(t);
+	public void addElement(Element e) {
+		elementList.addElement(e, e.getElementType().name());
 	}
 	
-	public ArrayList<Element> getElements() {
-		return elements;
+	public TextAndObjectList<Element> getElementList(){
+		return elementList;
 	}
+	
 }

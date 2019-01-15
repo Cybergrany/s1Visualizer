@@ -1,4 +1,4 @@
-package com.davesone.vis.ui.frames;
+package com.davesone.vis.ui;
 
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
