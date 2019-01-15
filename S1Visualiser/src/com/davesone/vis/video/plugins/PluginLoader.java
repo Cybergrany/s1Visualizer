@@ -3,6 +3,8 @@ package com.davesone.vis.video.plugins;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.DefaultListModel;
+
 import org.marvinproject.image.test.plugin.Plugin;
 
 import com.davesone.vis.core.Debug;
@@ -17,11 +19,15 @@ public class PluginLoader {
 	
 	public ArrayList<PluginContainer> plugins;
 	
+	private DefaultListModel<String> pluginnames;
+	
 	public PluginLoader() {
 		
 		File dir = new File(pluginDir);
+		Debug.printMessage("Loading plugins...");
 		
 		plugins = new ArrayList<>();
+		pluginnames = new DefaultListModel<String>();
 		
 		for (final File p:dir.listFiles()) {
 			PluginContainer pc = loadImagePlugin(p.getPath());
@@ -30,6 +36,10 @@ public class PluginLoader {
 		}
 		
 		Debug.printMessage("Total " + plugins.size() + " plugins loaded");
+		
+		for(PluginContainer p : plugins) {
+			pluginnames.addElement(p.getName());
+		}
 	}
 	
 	/**
@@ -59,5 +69,9 @@ public class PluginLoader {
 		}
 		Debug.printMessage("Loaded Plugin \"" + classname + "\"");
 		return new PluginContainer(i, classname);
+	}
+	
+	public DefaultListModel<String> getPluginModel(){
+		return pluginnames;
 	}
 }

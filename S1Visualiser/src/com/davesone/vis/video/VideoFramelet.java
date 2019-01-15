@@ -43,19 +43,17 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 	//TODO make sure calling code handles any errors sufficiently 
 	public VideoFramelet() {
 		attributes = new MarvinAttributes();
-		attributes.set("test", 0);
-		attributes.set("test2", 0);
+		attributes.set("path", "");
 	}
 	
 	@Override
 	public MarvinAttributesPanel getAttributesPanel() {
 		if(attributesPanel == null){
 			attributesPanel = new MarvinAttributesPanel();
-			attributesPanel.addLabel("lblBrightness", "bla");
-			attributesPanel.addHorizontalSlider("sliderBrightness", "test", -127, 127, 0, attributes);
+			attributesPanel.addLabel("lblPath", "Enter path of .mp4");
+			attributesPanel.addTextField("fldPath", "path", attributes);
 			attributesPanel.newComponentRow();
-			attributesPanel.addLabel("lblContrast", "bla");
-			attributesPanel.addHorizontalSlider("sliderContrast", "test2", -127, 127, 0, attributes);
+			
 		}
 		return attributesPanel;
 	}

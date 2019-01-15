@@ -45,26 +45,6 @@ public class PluginLoaderPanel extends JPanel{
 		}
 		
 		this.add(new JScrollPane(buttonPanel,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),BorderLayout.CENTER);
-		this.setMaximumSize(new Dimension(width, height));
-		this.setPreferredSize(new Dimension(width, height));
 		
 	}
-	
-	private ActionListener setInput = new ActionListener() {
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			for(PluginContainer p : pLoader.plugins) {
-				if(e.getActionCommand().equals(p.getName())) {
-					if(target.getPlugins().contains(p)) {
-						target.removePlugin(p);
-						((JButton)e.getSource()).setBackground(Color.BLUE);
-					}else {
-						target.addPlugin(p);
-						((JButton)e.getSource()).setBackground(Color.RED);
-					}
-				}
-			}
-		}
-	};
 }
