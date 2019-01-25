@@ -167,8 +167,8 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 	}
 
 	@Override
-	public void removePlugin(PluginContainer p) {
-		plugins.remove(p);
+	public void removePlugin(int index) {
+		plugins.remove(index);
 	}
 
 	@Override

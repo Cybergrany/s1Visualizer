@@ -45,6 +45,7 @@ public class AudioStreamHandler {
 	//TODO currently stops the current dispatcher, add logic to maybe add more
 	//dispatcher.addAudioProcessor(new whatever) to add stuff
 	public void setNewMixer(Mixer m) throws LineUnavailableException, UnsupportedAudioFileException{
+		
 		if(dispatcher!= null){
 			dispatcher.stop();
 		}
