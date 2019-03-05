@@ -16,6 +16,8 @@ public interface PluginCompatible {
 	
 	void addPlugin(PluginContainer p);
 	
+	void addPlugin(PluginContainer p, int index);
+	
 	void removePlugin(int index);
 
 }

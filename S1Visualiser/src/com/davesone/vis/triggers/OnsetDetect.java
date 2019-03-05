@@ -9,7 +9,7 @@ import be.tarsos.dsp.onsets.ComplexOnsetDetector;
 import be.tarsos.dsp.onsets.OnsetHandler;
 import marvin.gui.MarvinAttributesPanel;
 
-public class OnsetDetect extends AudioProcessorHandler implements OnsetHandler{
+public class OnsetDetect extends TriggerHandler implements OnsetHandler{
 	
 	
 //	private String[] settingnames = new String[] {"peakThreshold", "minimumInterOnsetInterval", "silenceThreshold"};
@@ -18,9 +18,10 @@ public class OnsetDetect extends AudioProcessorHandler implements OnsetHandler{
 	private double peakThreshold, minimumInterOnsetInterval, silenceThreshold;
 	
 	public OnsetDetect() {
+		super();
 //		settings = new TriggerSetting(settingnames, defsettingvals);
-		attributes.set("peakThreshold", 40);//div by ten for value
-		attributes.set("minimumInterOnsetInterval", 7);//div by ten for value
+		attributes.set("peakThreshold", 40);//div by 100 for value
+		attributes.set("minimumInterOnsetInterval", 7);//div by 100 for value0
 		attributes.set("silenceThreshold", -60);//negate for value
 		
 		getAttributesPanel().addLabel("lblPeakThresh", "Peak Threshold");
@@ -36,22 +37,17 @@ public class OnsetDetect extends AudioProcessorHandler implements OnsetHandler{
 	public void init(AudioStreamHandler h) throws TriggerException{
 		try {
 			super.init(h);
-			onSettingUpdate();
 			addAudioProcessor(newComplexOnsetDetector(peakThreshold, silenceThreshold));
 		}catch (Exception e) {
 			throw new TriggerException("Failed to setup trigger", e);
 		}
 	}
 	
-	public void onSettingUpdate() throws TriggerException{
-		try {
-			peakThreshold = (double) attributes.get("peakThreshold") / 10;
-			minimumInterOnsetInterval = (double) attributes.get("minimumInterOnsetInterval") / 10;
-			silenceThreshold = -((double) attributes.get("silenceThreshold"));
-			refreshAudioProcessor(newComplexOnsetDetector(peakThreshold, silenceThreshold));
-		}catch(Exception e) {
-			throw new TriggerException("Couldn't update trigger settings");
-		}
+	public void onSettingsUpdate(){
+		peakThreshold = adjustForRange((double) (int)attributes.get("peakThreshold"), 10, 80)/ 100;
+		minimumInterOnsetInterval = (double) (int)attributes.get("minimumInterOnsetInterval") / 100;
+		silenceThreshold = -((double) (int) attributes.get("silenceThreshold"));
+		refreshAudioProcessor(newComplexOnsetDetector(peakThreshold, silenceThreshold));
 	}
 	
 	
@@ -76,12 +72,18 @@ public class OnsetDetect extends AudioProcessorHandler implements OnsetHandler{
 
 	@Override
 	public void handleOnset(double time, double salience) {
-//		Debug.printMessage("Detected Perc");
-		triggered = true;
+		onTrigger();
 	}
 	
 	public AudioProcessor newComplexOnsetDetector(double pT, double sT) {
 		return new ComplexOnsetDetector((int) bufferSize, pT, minimumInterOnsetInterval, sT);
+	}
+	
+	@Override
+	public void printSettingValues() {
+		System.out.printf("Peak Threshold: %f \t"
+				+ "Minimum Interval: %f \t"
+				+ "Silence threshold: %f \t",peakThreshold, minimumInterOnsetInterval, silenceThreshold);
 	}
 	
 	@Override

@@ -6,7 +6,7 @@ import java.awt.Color;
 import javax.swing.JFrame;
 
 import com.davesone.vis.video.MarvinPanelCanvas;
-import com.davesone.vis.video.VideoFramelet;
+import com.davesone.vis.video.elements.VideoFramelet;
 
 import marvin.video.MarvinVideoInterfaceException;
 

@@ -27,4 +27,5 @@ public class Localization {
 	}public static boolean isWindows(){
 	   return getOsName().startsWith("Windows");
 	}
+	
 }

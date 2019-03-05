@@ -1,28 +1,47 @@
 package com.davesone.vis.core;
 
-import com.davesone.vis.audio.AudioStreamHandler;
+import org.marvinproject.image.test.plugin.Plugin;
+
+import com.davesone.vis.audio.AudioInputManager;
+import com.davesone.vis.triggers.TriggerThread;
+import com.davesone.vis.ui.MainFrame;
 import com.davesone.vis.video.plugins.PluginLoader;
 
 public class Main {
-	
+
+	private MainFrame mainFrame;
 	private PluginLoader pluginLoader;
-	private AudioStreamHandler audioHandler;
-	private static Main instance;
-	
+	private AudioInputManager audioManager;
+	private ShowManager showManager;
+
 	public Main() {
 		init();
+		mainFrame = new MainFrame(this);
+		mainFrame.setVisible(true);
 	}
 	
 	public void init() {
 		pluginLoader = new PluginLoader();//Loads plugins from directory
-		audioHandler = new AudioStreamHandler();//Inits the handler, a mixer must first be set for it to work
+		audioManager = new AudioInputManager();
 	}
 	
 	public static void main(String[] args) {
-		instance = new Main();
+		Main main = new Main();
 	}
 	
-	public static Main getInstance() {
-		return instance;
+	/**
+	 * Init the show, to be called from main frame
+	 */
+	public void initShow(TextAndObjectList<Scene> sceneList) {
+		showManager = new ShowManager(sceneList);
 	}
+	
+	public AudioInputManager getAudioManager() {
+		return audioManager;
+	}
+	
+	public PluginLoader getAvailablePlugins() {
+		return pluginLoader;
+	}
+	
 }

@@ -1,6 +1,8 @@
 package com.davesone.vis.core;
 
-import com.davesone.vis.triggers.Element;
+import java.io.Serializable;
+
+import com.davesone.vis.video.elements.Element;
 
 /**
  * Contains a collection of elements, such as videoframelets,

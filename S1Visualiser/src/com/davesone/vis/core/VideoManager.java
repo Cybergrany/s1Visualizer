@@ -1,14 +1,14 @@
 package com.davesone.vis.core;
 
-import com.davesone.vis.video.FrameBasedVideoThread;
+import com.davesone.vis.video.VideoThread;
 import com.davesone.vis.video.MarvinPanelCanvas;
 
 public class VideoManager{
 	
-	private FrameBasedVideoThread videoThread;
+	private VideoThread videoThread;
 	
 	public void initThread(int frameWidth, int frameHeight) {
-		videoThread = new FrameBasedVideoThread(frameWidth, frameHeight);
+		videoThread = new VideoThread(frameWidth, frameHeight);
 	}
 	
 	public void startThread() {

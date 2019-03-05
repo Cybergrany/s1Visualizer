@@ -1,4 +1,4 @@
-package com.davesone.vis.video;
+package com.davesone.vis.video.elements;
 
 import static com.davesone.vis.video.plugins.PluginCollection.scale;
 
@@ -6,9 +6,11 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 
 import com.davesone.vis.core.Debug;
-import com.davesone.vis.triggers.Element;
 import com.davesone.vis.triggers.Trigger;
 import com.davesone.vis.triggers.TriggerAction;
+import com.davesone.vis.video.CustomMarvinJavaCVAdapter;
+import com.davesone.vis.video.FrameBasedVideoObject;
+import com.davesone.vis.video.PluginCompatible;
 import com.davesone.vis.video.plugins.PluginContainer;
 
 import marvin.gui.MarvinAttributesPanel;
@@ -29,7 +31,7 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 	
 	final int previewSize = 3;
 	
-	public boolean isVisible;
+	public boolean isVisible = false;
 	
 	private MarvinImage image;
 	private MarvinAttributes attributes;
@@ -44,6 +46,8 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 	public VideoFramelet() {
 		attributes = new MarvinAttributes();
 		attributes.set("path", "");
+		attributes.set("xpos", 0);
+		attributes.set("ypos", 0);
 		plugins = new ArrayList<>();//init arraylist
 	}
 	
@@ -54,6 +58,9 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 			attributesPanel.addLabel("lblPath", "Enter path of .mp4");
 			attributesPanel.addTextField("fldPath", "path", attributes);
 			attributesPanel.newComponentRow();
+			attributesPanel.addLabel("lblpos", "Enter initial position(x, y) from top left");
+			attributesPanel.addTextField("fldx", "xpos", attributes);
+			attributesPanel.addTextField("fldy", "ypos", attributes);
 			
 		}
 		return attributesPanel;
@@ -64,14 +71,21 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 		return attributes;
 	}
 	
-	public void initialize(String path) throws MarvinVideoInterfaceException {
+	public void initialize() throws MarvinVideoInterfaceException {
+		String path;
+		try {
+			path = (String) attributes.get("path");
+			xPos = (int) attributes.get("xpos"); yPos = (int) attributes.get("ypos");
+		}catch(Exception e) {
+			throw new MarvinVideoInterfaceException("Error reading framelet path from attributes", e);
+		}
 		adapter = new CustomMarvinJavaCVAdapter(path);
-		xPos = 0; yPos = 0;
+		
 		origW = width = adapter.getImageWidth(); origH = height = adapter.getImageHeight();
 		
 		image = adapter.getFrame();
 		
-		int framelength = adapter.getGrabber().getLengthInVideoFrames();
+//		int framelength = adapter.getGrabber().getLengthInVideoFrames();
 //		preview = new MarvinImage[previewSize];
 		
 		//Setup previews
@@ -165,6 +179,11 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 		plugins.add(p);
 		
 	}
+	
+	@Override
+	public void addPlugin(PluginContainer p, int index) {
+		plugins.add(index, p);
+	}
 
 	@Override
 	public void removePlugin(int index) {
@@ -184,18 +203,6 @@ public class VideoFramelet implements PluginCompatible, FrameBasedVideoObject, E
 	@Override
 	public elementFlavour getElementType() {
 		return elementFlavour.VIDEOFRAMELET;
-	}
-
-	@Override
-	public Trigger getTrigger() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setTrigger(Trigger t) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

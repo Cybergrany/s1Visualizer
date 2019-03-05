@@ -8,7 +8,7 @@ import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.onsets.OnsetHandler;
 import be.tarsos.dsp.onsets.PercussionOnsetDetector;
 
-public class PercussionDetect extends AudioProcessorHandler implements OnsetHandler {
+public class PercussionDetect extends TriggerHandler implements OnsetHandler {
 	
 //	private String[] settingnames = new String[] {"sensitivity", "threshold"};
 //	private double[] defsettingvals = new double[] {50, 10};
@@ -16,7 +16,7 @@ public class PercussionDetect extends AudioProcessorHandler implements OnsetHand
 	private double threshold;
 	
 	public PercussionDetect() {
-//		super(h);
+		super();
 //		settings = new TriggerSetting(settingnames, defsettingvals);
 		attributes.set("sensitivity", 50);
 		attributes.set("threshold", 10);
@@ -31,23 +31,18 @@ public class PercussionDetect extends AudioProcessorHandler implements OnsetHand
 	public void init(AudioStreamHandler h) throws TriggerException{
 		try {
 			super.init(h);
-			onSettingUpdate();
 			addAudioProcessor(newPercussionProcessor(sensitivity, threshold));
 		}catch (Exception e){
 			throw new TriggerException("Failed to setup trigger", e);
 		}
 	}
 	
-	public void onSettingUpdate() throws TriggerException{
-		try {
-//			sensitivity = settings.getSettingValue(0);
-//			threshold = settings.getSettingValue(1);
-			sensitivity = (double) attributes.get("sensitivity");
-			threshold = (double) attributes.get("threshold");
-			refreshAudioProcessor(newPercussionProcessor(sensitivity, threshold));
-		}catch(Exception e) {
-			throw new TriggerException("Failed to update trigger", e);
-		}
+	public void onSettingsUpdate(){
+		double s = (double) (int)attributes.get("sensitivity");
+		double t = adjustForRange((double) (int)attributes.get("threshold"), 0, 20);
+		sensitivity = s;
+		threshold = t;
+		refreshAudioProcessor(newPercussionProcessor(sensitivity, threshold));
 	}
 	
 	//REPLACED BY SETTING CLASS
@@ -76,9 +71,13 @@ public class PercussionDetect extends AudioProcessorHandler implements OnsetHand
 	private AudioProcessor newPercussionProcessor(double s, double t) {
 		return new PercussionOnsetDetector(sampleRate, (int) bufferSize, this, s, t);
 	}
+	
+	public void printSettingValues() {
+		System.out.printf("Sensitivity: %f\tThreshold: %f", sensitivity, threshold);
+	}
 
 	@Override
 	public void handleOnset(double time, double salience) {
-		triggered = true;
+		onTrigger();
 	}
 }

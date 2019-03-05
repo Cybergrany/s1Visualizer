@@ -1,7 +1,10 @@
-package com.davesone.vis.triggers;
+package com.davesone.vis.video.elements;
 
 import java.awt.Dimension;
+import java.io.Serializable;
 import java.util.ArrayList;
+
+import com.davesone.vis.triggers.TriggerAction;
 
 import marvin.gui.MarvinAttributesPanel;
 import marvin.util.MarvinAttributes;
@@ -18,15 +21,11 @@ public interface Element {
 	 * objects into their respective places
 	 * in the render window
 	 */
-	public enum elementFlavour {VIDEOFRAMELET};
+	public enum elementFlavour {VIDEOFRAMELET, BACKGROUND};
 	public elementFlavour getElementType();
 	
 	public MarvinAttributesPanel getAttributesPanel();
 	public MarvinAttributes getAttributes();
-	
-	public Trigger getTrigger();
-	
-	public void setTrigger(Trigger t);
 	
 	public void setTriggerAction(TriggerAction ta);
 	

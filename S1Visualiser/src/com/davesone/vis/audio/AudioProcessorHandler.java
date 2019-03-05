@@ -1,5 +1,6 @@
 package com.davesone.vis.audio;
 
+import com.davesone.vis.core.Debug;
 import com.davesone.vis.triggers.Trigger;
 import com.davesone.vis.triggers.TriggerException;
 
@@ -14,26 +15,26 @@ import marvin.util.MarvinAttributes;
  * @author Owner
  *
  */
-public class AudioProcessorHandler implements AudioProcessor, Trigger{//TODO the implementation of trigger is a bit messy
+public class AudioProcessorHandler implements AudioProcessor{//TODO the implementation of trigger is a bit messy
 	
 	private AudioDispatcher dispatcher;
 	
 	public float sampleRate, bufferSize;
-	public boolean triggered = false;
 //	public TriggerSetting settings;
-	public MarvinAttributes attributes;
 	private AudioProcessor processor;
-	private MarvinAttributesPanel attributesPanel; 
+	private boolean initialized = false;
 	
 	public AudioProcessorHandler() {
-		attributes = new MarvinAttributes();
+		
 	}
 	
 	public void init(AudioStreamHandler h) throws TriggerException{
 		dispatcher = h.getDispatcher();
 		sampleRate = h.sampleRate;
 		bufferSize = h.bufferSize;
+		initialized = true;
 	}
+	
 	
 	public void addAudioProcessor(AudioProcessor a) {
 		dispatcher.addAudioProcessor(a);
@@ -67,16 +68,6 @@ public class AudioProcessorHandler implements AudioProcessor, Trigger{//TODO the
 		
 	}
 	
-	@Override
-	public boolean isTriggered() {
-		return triggered;
-	}
-	
-	@Override
-	public void resetTrigger() {
-		triggered = false;
-	}
-	
 	public AudioProcessorHandler getHandler() {
 		return this;
 	}
@@ -99,18 +90,9 @@ public class AudioProcessorHandler implements AudioProcessor, Trigger{//TODO the
 //	public void onSettingUpdate() throws TriggerException {
 //		throw new TriggerException("Settings not initialized");
 //	}
-
-	@Override
-	public void start() throws TriggerException {
-		throw new TriggerException("Settings not initialized");
-	}
 	
-	public MarvinAttributesPanel getAttributesPanel() {
-		if(attributesPanel == null) {
-			attributesPanel = new MarvinAttributesPanel();
-			return attributesPanel;
-		}
-		return attributesPanel;
+	public boolean isInitialized() {
+		return initialized;
 	}
 	
 }

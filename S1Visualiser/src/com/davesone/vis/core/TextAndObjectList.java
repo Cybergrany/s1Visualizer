@@ -10,9 +10,9 @@ import javax.swing.JList;
  * @author Owner
  *
  */
-public class TextAndObjectList<listelements> {
+public class TextAndObjectList<listelements>{
 	
-	private ArrayList<listelements> elementlist;
+	private  ArrayList<listelements> elementlist;
 	private DefaultListModel<String> elementnames;
 	private JList list;
 	
@@ -36,6 +36,20 @@ public class TextAndObjectList<listelements> {
 	
 	public listelements getElement(int index) {
 		return elementlist.get(index);
+	}
+	
+	public ArrayList<listelements> getElements(){
+		return elementlist;
+	}
+	
+	public String[] getNames() {
+		String[] s = new String[elementnames.size()];
+		
+		for(int i = 0; i < s.length; i++) {
+			s[i] = elementnames.get(i);
+		}
+		
+		return s;
 	}
 	
 	/**
@@ -75,4 +89,5 @@ public class TextAndObjectList<listelements> {
 		elementnames.set(index2, s1);
 //		elementnames.add(index2, s1);
 	}
+	
 }

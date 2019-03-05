@@ -1,20 +1,22 @@
 package com.davesone.vis.triggers;
 
+import java.io.Serializable;
+
 import com.davesone.vis.audio.AudioProcessorHandler;
 
 import marvin.gui.MarvinAttributesPanel;
 
-public interface Trigger {
+public interface Trigger extends Serializable{
+	
+	public void onTrigger();
 	
 	/**
-	 * main trigger thread will listen for this
+	 * Get the listening thread
 	 */
-	public boolean isTriggered();
 	
-	/**
-	 * Call when operation on triggeraction has been carried out
-	 */
-	public void resetTrigger();
+	public Thread getListeningThread();
+	
+	public void setListeningThread(Thread t);
 	
 	/**
 	 * Used to get the attached processing handler
@@ -24,25 +26,17 @@ public interface Trigger {
 	
 	public MarvinAttributesPanel getAttributesPanel();
 	
-	/**
-	 * Used to display settings list and modify them
-	 */
-//	public TriggerSetting getSettings();
+	public void setAttributesPanel(MarvinAttributesPanel p);
 	
 	/**
-	 * Called to change a setting values. Calling code will check
-	 * string array of getSettings to find index
+	 * Prints current setting values, 
+	 * useful for validation
 	 */
-//	public void changeSetting(int index, double value) throws TriggerException;
+	public void printSettingValues();
 	
 	/**
-	 * Called every time values need to be refreshed
+	 * Called every time the trigger's settings are updated
 	 */
-//	public void onSettingUpdate() throws TriggerException;
-	
-	/**
-	 * Ensure that setting values are not null
-	 */
-	public void start() throws TriggerException;
+	public void onSettingsUpdate();
 
 }

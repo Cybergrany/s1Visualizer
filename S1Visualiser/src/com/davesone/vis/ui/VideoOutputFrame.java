@@ -38,6 +38,7 @@ public class VideoOutputFrame extends JFrame{
 //		setLayout(new BorderLayout());
 		add(manager.getCanvas());
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setVisible(true);
 	}
 	
 	public VideoManager getManager() {

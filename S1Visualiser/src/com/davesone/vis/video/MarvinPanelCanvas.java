@@ -7,7 +7,10 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 
+import org.opencv.video.Video;
+
 import com.davesone.vis.core.Debug;
+import com.davesone.vis.video.elements.VideoFramelet;
 import com.davesone.vis.video.plugins.PluginContainer;
 
 import marvin.gui.MarvinImagePanel;
@@ -21,27 +24,27 @@ import marvin.video.MarvinVideoInterfaceException;
  * @author Owner
  *
  */
-public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVideoObject, Runnable{
+public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVideoObject{
 	
-	private MarvinImage masterImage, bgImage;
-	private CustomMarvinJavaCVAdapter bgAdapter;
+	private MarvinImage masterImage /**, bgImage*/;
+//	private CustomMarvinJavaCVAdapter bgAdapter;
 	
-	private Thread frameletRenderThread;
+//	private Thread frameletRenderThread;
 	
 	private Color bgColor = Color.BLACK;
 	
 	private ArrayList<VideoFramelet> framelets;
 	
 	private int width, height;
-	private boolean renderFramelets, bgisVideo = false;
+	private boolean renderFramelets = false, canRender = true;/**, bgisVideo = false*/;
 	
 	public MarvinPanelCanvas(int w, int h) {
 		super();
 		width = w; height = h;
 		masterImage = new MarvinImage(width, height);
-		bgImage = new MarvinImage(width, height);
+//		bgImage = new MarvinImage(width, height);
 		
-		setBgColor(bgColor);//TODO TEMP
+//		setBgColor(bgColor);//TODO TEMP
 		
 		framelets = new ArrayList<>();
 		
@@ -54,9 +57,23 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 		
 	}
 	
-	public void initFrameletThread() {
-		frameletRenderThread = new Thread(this, "Framelet Renderer");
-		renderFramelets = false;
+//	public void initFrameletThread() {
+////		frameletRenderThread = new Thread(this, "Framelet Renderer");
+////		frameletRenderThread.start();
+//	}
+	
+	public void initFramelets(ArrayList<VideoFramelet> f) {
+		framelets = f;
+		for(VideoFramelet vf : framelets) {
+			try {
+				Debug.printMessage("Adding framelet with path " + vf.getAttributes().get("path"));
+				vf.initialize();
+			} catch (MarvinVideoInterfaceException e) {
+				Debug.printError("Failed to initialize framelet.");
+				e.printStackTrace();
+			}
+		}
+		renderFramelets = true;
 	}
 	
 	public void tick() {
@@ -66,13 +83,43 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 	}
 	
 	public void render() {
-		if(bgisVideo) {
+//		if(bgisVideo) {
+//			try {
+//				bgImage = bgAdapter.getFrame();
+//			} catch (MarvinVideoInterfaceException e) {
+//				Debug.printError("Canvas background failed to play");
+//			}
+//		}else {
+//			setBgColor(bgColor);
+//		}
+//		
+//		bgImage.update();
+		
+		if(canRender) {
 			try {
-				bgImage = bgAdapter.getFrame();
-				bgImage.update();
-			} catch (MarvinVideoInterfaceException e) {
-				Debug.printError("Canvas background failed to play");
-			}
+				masterImage.fillRect(0, 0, width, height, bgColor);
+				
+				//Temp code
+				if(renderFramelets) {
+					int i = 0;
+					for (VideoFramelet f : framelets) {
+						if(f.isVisible) {
+							f.render();
+							if(i == 0) {
+								addFrameletToImage(f, null);
+							}else {
+								addFrameletToImage(f, framelets.get(i-1));
+							}
+							i++;
+						}
+					}
+				}
+				
+				//Temp code
+				
+				masterImage.update();
+				repaint();
+			}catch(Exception e) {}
 		}
 	}
 	
@@ -81,34 +128,36 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 	 * Care should be taken in tick methods to avoid requiring render-specific values
 	 */
 	@Override
-	public void run() {
-		while(renderFramelets) {
-			int i = 0;
-			for (VideoFramelet f : framelets) {
-				if(f.isVisible) {
-					f.render();
-					if(i == 0) {
-						addFrameletToImage(f, null);
-					}else {
-						addFrameletToImage(f, framelets.get(i-1));
-					}
-					masterImage.update();
-					repaint();
-					i++;
-				}
-			}
-		}
-	}
+//	public void run() {
+//		while(renderFramelets) {
+//			int i = 0;
+//			for (VideoFramelet f : framelets) {
+//				if(f.isVisible) {
+//					f.render();
+//					if(i == 0) {
+//						addFrameletToImage(f, null);
+//					}else {
+//						addFrameletToImage(f, framelets.get(i-1));
+//					}
+////					masterImage.update();
+////					repaint();
+//					i++;
+//				}
+//			}
+//		}
+//	}
 	
 	public void resize(int w, int h) {
+		canRender = false;
 		width = w; height = h;
 		masterImage.setDimension(width, height);
-		bgImage.setDimension(width, height);
+//		bgImage.setDimension(width, height);
 		masterImage.updateColorArray();
 		masterImage.update();
-		bgImage.updateColorArray();
-		bgImage.update();
+//		bgImage.updateColorArray();
+//		bgImage.update();
 		repaint();
+		canRender = true;
 //		System.out.println(width);
 //		masterImage.getWidth();//For some reason calling this prevents the image array overflowing ¯\_(;-;)_/¯
 	}
@@ -118,37 +167,34 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 		return masterImage;
 	}
 	
-	public void setBgColor(Color c) {
-		bgisVideo = false;
-		bgImage.fillRect(0, 0, width, height, c);
-		bgImage.update();
-	}
+//	public void setBgColor(Color c) {
+//		bgisVideo = false;
+//		bgImage.fillRect(0, 0, width, height, c);
+//		bgImage.update();
+//	}
 	
 	public void setBgVideo(String path) {
-		bgAdapter = new CustomMarvinJavaCVAdapter(path);
-		bgisVideo = true;
+//		bgAdapter = new CustomMarvinJavaCVAdapter(path);
+//		bgisVideo = true;
 	}
 	
-	public void addFramelet(String filepath) {
-		try {
-			VideoFramelet f = new VideoFramelet(filepath);
-			framelets.add(f);
-		} catch (MarvinVideoInterfaceException e) {
-			// TODO error handle
-			e.printStackTrace();
-		}
-		if(!renderFramelets) {
-			renderFramelets = true;
-			frameletRenderThread.start();
-		}
-	}
+//	public void addFramelet(String filepath) {
+//		try {
+//			VideoFramelet f = new VideoFramelet(filepath);
+//			framelets.add(f);
+//		} catch (MarvinVideoInterfaceException e) {
+//			// TODO error handle
+//			e.printStackTrace();
+//		}
+//		if(!renderFramelets) {
+//			renderFramelets = true;
+//			frameletRenderThread.start();
+//		}
+//	}
 	
 	public void addFramelet(VideoFramelet f) {
 		framelets.add(f);
-		if(!renderFramelets) {
-			renderFramelets = true;
-			frameletRenderThread.start();
-		}
+		renderFramelets = true;
 	}
 	
 	public void removeFramelet(VideoFramelet f) {
@@ -178,7 +224,7 @@ public class MarvinPanelCanvas extends MarvinImagePanel implements FrameBasedVid
 		super.paintComponent(g);
 		
 		if(masterImage != null){
-			g.drawImage(bgImage.getBufferedImage(), 0, 0, this);
+//			g.drawImage(bgImage.getBufferedImage(), 0, 0, this);
 			g.drawImage(masterImage.getBufferedImage(), 0,0,this);
 		}
 	}

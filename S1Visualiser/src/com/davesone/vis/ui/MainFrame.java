@@ -2,7 +2,6 @@ package com.davesone.vis.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -12,6 +11,10 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 
 import javax.sound.sampled.AudioSystem;
@@ -19,11 +22,13 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -34,14 +39,18 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 
 import com.davesone.vis.audio.AudioStreamHandler;
+import com.davesone.vis.core.Debug;
 import com.davesone.vis.core.Localization;
+import com.davesone.vis.core.Main;
 import com.davesone.vis.core.Scene;
 import com.davesone.vis.core.TextAndObjectList;
 import com.davesone.vis.core.UIWrapperManager;
-import com.davesone.vis.triggers.Element;
 import com.davesone.vis.triggers.Trigger;
 import com.davesone.vis.triggers.TriggerException;
+import com.davesone.vis.triggers.TriggerThread;
 import com.davesone.vis.video.PluginCompatible;
+import com.davesone.vis.video.elements.Background;
+import com.davesone.vis.video.elements.Element;
 import com.davesone.vis.video.plugins.PluginContainer;
 import com.davesone.vis.video.plugins.PluginLoader;
 
@@ -54,10 +63,12 @@ import marvin.gui.MarvinAttributesPanel;
  */
 public class MainFrame extends JFrame {
 	
+	private Main main;
+	
 	private TextAndObjectList<Scene> sceneList;
 	private DefaultListModel<String> appliedPlugins;
 
-	private MarvinAttributesPanel AttributePanel, pluginAttributePanel, defaultAttributePanelState;
+	private MarvinAttributesPanel AttributePanel, pluginAttributePanel, defaultAttributePanelState, currentTriggerPanel;
 	private OscilliscopeMonitorPanel oscilliscopePanel;
 	private Scene currentScene;//currently selected scene
 	private Trigger currentTrigger;
@@ -65,44 +76,53 @@ public class MainFrame extends JFrame {
 	
 	private AudioStreamHandler audioHandler;//Audio
 	
-	//Elements that need to be accessed from listners=
-	private JPanel ElementAttributeEditor, PluginSettingsBorder, audiomonitorborder;
+	//Elements that need to be accessed from listners
+	private JPanel ElementAttributeEditor, PluginSettingsBorder, audiomonitorborder, panel, showLauncher, savenloadPanel;
 	private JList currentElementList, AppliedPluginList, pluginList, sceneJlist;
 	private TitledBorder elementTitle, elementEditTitle;
 	private ButtonGroup sceneButtons, elementButtons;
 	private JButton btnDeleteScene, btnAddScene, btnEditScene, btnUp, btnDown,//Scene
-					btnDeletePlugin, btnModifySettings_1, btnAddToSelected,//Plugins
+					btnDeletePlugin, btnModifySettings_1, btnAddToSelected, btnAddPlugin,//Plugins
 					btnSoundInput, btnSoundTrigger,//Sound
-					btnDeleteElement, btnAddElement, btnEditElement;//Element
+					btnDeleteElement, btnAddElement, btnEditElement,//Element
+					btnLaunchShow, btnSaveSettings, btnLoadSettings;
 	private GridBagConstraints gbc_AttributePanel, gbc_pluginSettings;
 	
 	private boolean unsavedChanges = false, unsavedPluginChanges = false;
+	private int currentTriggerIndex = -1;
 	
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainFrame frame = new MainFrame();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					MainFrame frame = new MainFrame();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 	
-	private void init() {
-		audioHandler = new AudioStreamHandler();
+	/**
+	 * Create the frame.
+	 */
+	public MainFrame(Main m) {
+		main = m;
+		initElements();
+		initLayout();
+		initButtonsAndListeners();
+	}
+	private void initElements() {
+		audioHandler = main.getAudioManager().getAudioStreamHandler();
 		
 		sceneButtons = new ButtonGroup();
 		elementButtons = new ButtonGroup();
 		
-		sceneList = new TextAndObjectList<Scene>();
-		currentScene = new Scene();
-		availablePlugins = new PluginLoader();
+		availablePlugins = main.getAvailablePlugins();
 		
 		btnDeleteScene = new JButton("Delete Scene");
 		sceneButtons.add(btnDeleteScene);
@@ -110,15 +130,12 @@ public class MainFrame extends JFrame {
 		btnAddScene = new JButton("Add Scene");
 		sceneButtons.add(btnAddScene);
 		
-		
 		btnEditScene = new JButton("Edit Scene");
 		sceneButtons.add(btnEditScene);
 		
-		AppliedPluginList = new JList();
-		
 		btnAddPlugin = new JButton("Add Plugin");
-		panel.add(btnAddPlugin);
 		panel = new JPanel();
+		panel.add(btnAddPlugin);
 		oscilliscopePanel = new OscilliscopeMonitorPanel();
 		btnDown = new JButton("Move Down");
 		sceneButtons.add(btnDown);
@@ -132,29 +149,56 @@ public class MainFrame extends JFrame {
 		btnDeletePlugin = new JButton("Remove Plugin");
 		panel.add(btnDeletePlugin);
 		
+		btnEditElement = new JButton("Edit Element");
+		elementButtons.add(btnEditElement);
+		
+		btnSoundInput = new JButton("Sound Input");
+		
+		btnSoundTrigger = new JButton("Sound Trigger");
+		
+		btnDeleteElement = new JButton("Delete Element");
+		elementButtons.add(btnDeleteElement);
+		
+		btnAddElement = new JButton("Add Element");
+		elementButtons.add(btnAddElement);
+		
+		btnSaveSettings = new JButton("Save Settings...");
+		btnLoadSettings = new JButton("Load Settings...");
+		
 		defaultAttributePanelState = new MarvinAttributesPanel();
 		defaultAttributePanelState.addLabel("defLab", "No plugin with modifyible attributes selcted");
-	}
-
-	/**
-	 * Create the frame.
-	 */
-	public MainFrame() {
-		init();
 		
-		setResizable(false);
-		
+		//Lists
+		sceneList = new TextAndObjectList<Scene>();
+		currentScene = new Scene();
+		AppliedPluginList = new JList();
 		sceneList.addElement(currentScene, "Scene");
-		
+		sceneList.getElement(sceneList.size()-1).addElement(new Background());
 		sceneJlist = sceneList.getJList();
+		currentElementList = currentScene.getElementList().getJList();
+	}
+	
+	private void reloadDisplayComponents() {
+		sceneJlist = sceneList.getJList();
+		currentScene = sceneList.getElement(0);
+		currentElementList = currentScene.getElementList().getJList();
+		validate();
+		repaint();
+	}
+	
+	/**
+	 * Set up the main layout
+	 */
+	private void initLayout() {
 		setTitle("S1 VIZ");
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 1300, 725);
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{369, 458, 349, 0};
 		gridBagLayout.rowHeights = new int[]{175, 180, 150, 0};
-		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gridBagLayout.columnWeights = new double[]{1.0, 0.0, 1.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
 		getContentPane().setLayout(gridBagLayout);
 		
@@ -279,11 +323,8 @@ public class MainFrame extends JFrame {
 		gbc_AudioSettings.gridx = 0;
 		gbc_AudioSettings.gridy = 0;
 		AudioSettingsBorder.add(AudioSettings, gbc_AudioSettings);
-		
-		btnSoundInput = new JButton("Sound Input");
+
 		AudioSettings.add(btnSoundInput);
-		
-		btnSoundTrigger = new JButton("Sound Trigger");
 		AudioSettings.add(btnSoundTrigger);
 		
 		audiomonitorborder = new JPanel();
@@ -306,7 +347,7 @@ public class MainFrame extends JFrame {
 		gbc_audiomonitorpanel.gridy = 0;
 		audiomonitorborder.add(oscilliscopePanel, gbc_audiomonitorpanel);
 
-		currentElementList = currentScene.getElementList().getJList();
+		
 		currentElementList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		JPanel PluginPanelBorder = new JPanel();
@@ -399,26 +440,17 @@ public class MainFrame extends JFrame {
 		gbl_ElementEditPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		ElementEditPanel.setLayout(gbl_ElementEditPanel);
 		
-		btnDeleteElement = new JButton("Delete Element");
-		elementButtons.add(btnDeleteElement);
-		
 		GridBagConstraints gbc_btnDeleteElement = new GridBagConstraints();
 		gbc_btnDeleteElement.insets = new Insets(0, 0, 5, 5);
 		gbc_btnDeleteElement.gridx = 1;
 		gbc_btnDeleteElement.gridy = 0;
 		ElementEditPanel.add(btnDeleteElement, gbc_btnDeleteElement);
-		
-		btnAddElement = new JButton("Add Element");
-		elementButtons.add(btnAddElement);
-		
+			
 		GridBagConstraints gbc_btnAddElement = new GridBagConstraints();
 		gbc_btnAddElement.insets = new Insets(0, 0, 5, 5);
 		gbc_btnAddElement.gridx = 0;
 		gbc_btnAddElement.gridy = 0;
 		ElementEditPanel.add(btnAddElement, gbc_btnAddElement);
-		
-		btnEditElement = new JButton("Edit Element");
-		elementButtons.add(btnEditElement);
 		
 		GridBagConstraints gbc_btnEditElement = new GridBagConstraints();
 		gbc_btnEditElement.insets = new Insets(0, 0, 5, 0);
@@ -435,12 +467,42 @@ public class MainFrame extends JFrame {
 		gbc_ElementListPane.gridy = 1;
 		ElementEditPanel.add(ElementListPane, gbc_ElementListPane);
 		
+		savenloadPanel = new JPanel();
+		GridBagConstraints gbc_savenloadPanel = new GridBagConstraints();
+		gbc_savenloadPanel.insets = new Insets(0, 0, 0, 5);
+		gbc_savenloadPanel.fill = GridBagConstraints.BOTH;
+		gbc_savenloadPanel.gridx = 0;
+		gbc_savenloadPanel.gridy = 2;
+		getContentPane().add(savenloadPanel, gbc_savenloadPanel);
+		savenloadPanel.setLayout(new BoxLayout(savenloadPanel, BoxLayout.X_AXIS));
 		
+		
+		savenloadPanel.add(btnSaveSettings);
+		
+		savenloadPanel.add(btnLoadSettings);
+		
+		showLauncher = new JPanel();
+		GridBagConstraints gbc_showLauncher = new GridBagConstraints();
+		gbc_showLauncher.fill = GridBagConstraints.BOTH;
+		gbc_showLauncher.gridx = 2;
+		gbc_showLauncher.gridy = 2;
+		getContentPane().add(showLauncher, gbc_showLauncher);
+		showLauncher.setLayout(new BorderLayout(0, 0));
+		
+		btnLaunchShow = new JButton("LAUNCH SHOW");
+		showLauncher.add(btnLaunchShow, BorderLayout.CENTER);
+	}
+
+	
+	private void initButtonsAndListeners() {
 		btnAddPlugin.setEnabled(false);
 		btnModifySettings_1.setEnabled(false);
 		setButtonGroupEnabled(elementButtons, false);
 		btnDeleteScene.setEnabled(false);
 		btnDeletePlugin.setEnabled(false);
+		btnSoundTrigger.setEnabled(false);
+		btnLaunchShow.setEnabled(false);
+		btnLaunchShow.setBackground(Color.BLUE);
 		
 		//Plugin delete
 		btnDeletePlugin.addActionListener(deletePlugin);
@@ -484,6 +546,11 @@ public class MainFrame extends JFrame {
 		//Sound setup
 		btnSoundInput.addActionListener(soundInputSetup);
 		
+		//Show launcher
+		btnLaunchShow.addActionListener(launchShow);
+		
+		btnSaveSettings.addActionListener(saveSettings);
+		btnLoadSettings.addActionListener(loadSettings);
 	}
 	
 	/**
@@ -506,18 +573,24 @@ public class MainFrame extends JFrame {
 	 * JDIALOGS
 	 */
 	
-	private MarvinAttributesPanel currentTriggerPanel;
-	
 	private JDialog triggerChooser() {
 		JDialog d = new JDialog(this, "Choose a trigger type", true);
 		JButton btnConfirm = new JButton("Confirm");
 		d.getContentPane().setLayout(new BorderLayout());
-		final JComboBox<String> triggerList = new JComboBox<String>(UIWrapperManager.elementFlavors);
+		final JComboBox<String> triggerList = new JComboBox<String>(UIWrapperManager.triggerFlavours);
 //		final JOptionPane opane = new JOptionPane("", JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+//		Trigger currentTrigger;
 		
-		if(currentTrigger == null) {
+		try {//If trigger already set
+			currentTrigger = main.getAudioManager().getListeningThread().getTrigger();
+			triggerList.setSelectedIndex(currentTriggerIndex);
+		}catch (TriggerException e) {
 			currentTrigger = UIWrapperManager.stringToTrigger(triggerList.getItemAt(triggerList.getSelectedIndex()));
 		}
+		
+//		if(currentTrigger == null) {
+//			currentTrigger = UIWrapperManager.stringToTrigger(triggerList.getItemAt(triggerList.getSelectedIndex()));
+//		}
 		
 		if(currentTriggerPanel == null) {
 			currentTriggerPanel = currentTrigger.getAttributesPanel();
@@ -530,8 +603,8 @@ public class MainFrame extends JFrame {
 				d.remove(currentTriggerPanel);
 //				d.getContentPane().remove(currentTriggerPanel);
 				currentTrigger = UIWrapperManager.stringToTrigger(triggerList.getItemAt(triggerList.getSelectedIndex()));
+				
 				currentTriggerPanel = currentTrigger.getAttributesPanel();
-//				currentTriggerPanel = UIWrapperManager.stringToTrigger(triggerList.getItemAt(triggerList.getSelectedIndex())).getAttributesPanel();
 				d.getContentPane().add(currentTriggerPanel, BorderLayout.CENTER);
 //				d.getContentPane().add(currentTriggerPanel);
 				d.validate();
@@ -543,7 +616,32 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentTriggerPanel.applyValues();
+				try {
+//					main.getAudioManager().setProcessor(currentTrigger);
+					main.getAudioManager().setListeningThread(new TriggerThread(currentTrigger, oscilliscopePanel));
+					oscilliscopePanel.setListeningThread(main.getAudioManager().getListeningThread());
+				} catch (TriggerException e1) {
+					showError("Error setting triggerThread", null);
+				}
+				
+				currentTrigger.setAttributesPanel(currentTriggerPanel);
+				currentTrigger.getAttributesPanel().applyValues();
+				currentTrigger.onSettingsUpdate();
+				
+				Debug.printMessage("Saved trigger \"%s\" with following settings:\n", triggerList.getItemAt(triggerList.getSelectedIndex()));
+				currentTrigger.printSettingValues();
+				
+//				if(!currentTrigger.getHandler().isInitialized()) {
+//					try {
+//						currentTrigger.getHandler().init(audioHandler);
+//					} catch (TriggerException e1) {
+//						showError("Error while setting trigger", null);
+//						e1.printStackTrace();
+//					}
+//					currentTrigger.getHandler().refreshAudioProcessor((AudioProcessor) currentTrigger);
+//				}
+				currentTriggerIndex = triggerList.getSelectedIndex();
+				btnLaunchShow.setEnabled(true);
 				d.dispose();
 			}
 		});
@@ -611,7 +709,7 @@ public class MainFrame extends JFrame {
 		d.setVisible(true);
 		return d;
 	}
-	
+
 	/**
 	 * ACTION LISTENERS
 	 */
@@ -621,6 +719,8 @@ public class MainFrame extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			sceneList.addElement(new Scene(), "Scene");
+			//Add the background by default
+			sceneList.getElement(sceneList.size()-1).addElement(new Background());
 			btnDeleteScene.setEnabled(true);
 		}
 	};
@@ -706,7 +806,11 @@ public class MainFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			int index = currentElementList.getSelectedIndex();
 			
-			currentScene.getElementList().removeElement(index);
+			if(currentScene.getElementList().getElement(index) instanceof Background) {
+				showError("Cannot delete background", null);
+			}else {
+				currentScene.getElementList().removeElement(index);
+			}
 			
 			if(currentScene.getElementList().size() == 0)
 				btnDeleteElement.setEnabled(false);
@@ -810,12 +914,16 @@ public class MainFrame extends JFrame {
 			
 			//Button should only be activated if element is PlugComp
 			//so casting without check should be safe
-			PluginCompatible currentElement = (PluginCompatible)currentScene.getElementList().getElement(elementIndex);
+//			PluginCompatible currentElement = (PluginCompatible)currentScene.getElementList().getElement(elementIndex);
 			
-			if(!currentElement.getPlugins().contains(availablePlugins.plugins.get(selectedPluginIndex))) {//No adding twice
-				currentElement.addPlugin(availablePlugins.plugins.get(selectedPluginIndex));
-				appliedPlugins.addElement(availablePlugins.plugins.get(selectedPluginIndex).getName());
+//			if(!currentElement.getPlugins().contains(availablePlugins.plugins.get(selectedPluginIndex))) {//No adding twice
+//				currentElement.addPlugin(availablePlugins.plugins.get(selectedPluginIndex));
+//				appliedPlugins.addElement(availablePlugins.plugins.get(selectedPluginIndex).getName());
 				
+			if(!((PluginCompatible) (currentScene.getElementList().getElement(elementIndex))).getPlugins().contains(availablePlugins.plugins.get(selectedPluginIndex))){//No adding twice) )
+				((PluginCompatible) (currentScene.getElementList().getElement(elementIndex))).addPlugin(availablePlugins.plugins.get(selectedPluginIndex));
+				appliedPlugins.addElement(availablePlugins.plugins.get(selectedPluginIndex).getName());
+					
 				btnDeletePlugin.setEnabled(true);
 				btnModifySettings_1.setEnabled(true);
 			}
@@ -846,7 +954,9 @@ public class MainFrame extends JFrame {
 					unsavedPluginChanges = true;
 					
 				}else {
+					((PluginCompatible) (currentScene.getElementList().getElement(currentElementList.getSelectedIndex()))).removePlugin(index);
 					plugin.getPlugin().getAttributesPanel().applyValues();
+					((PluginCompatible) (currentScene.getElementList().getElement(currentElementList.getSelectedIndex()))).addPlugin(plugin, index);
 					btnModifySettings_1.setBackground(Color.GREEN);
 					btnModifySettings_1.setText("Modify Settings");
 					
@@ -899,12 +1009,22 @@ public class MainFrame extends JFrame {
 					Mixer m = AudioSystem.getMixer(info);
 					try {
 						audioHandler.setNewMixer(m);
-						oscilliscopePanel.init(audioHandler);
-						if(!oscilliscopePanel.isInitialized()) {
+						btnSoundTrigger.setEnabled(true);
+						if(!main.getAudioManager().initialized) {
+							main.getAudioManager().initStreams();
+							Debug.printMessage("Initializing audio streams...");
 							oscilliscopePanel.init(audioHandler);
 						}else {
-							oscilliscopePanel.refreshOscilloscope();
+							oscilliscopePanel.refreshOscilloscope(audioHandler);
 						}
+//						audioHandler.setNewMixer(m);
+//						btnSoundTrigger.setEnabled(true);
+//						oscilliscopePanel.init(audioHandler);
+//						if(!oscilliscopePanel.isInitialized()) {
+//							oscilliscopePanel.init(audioHandler);
+//						}else {
+//							oscilliscopePanel.refreshOscilloscope();
+//						}
 					} catch (LineUnavailableException | UnsupportedAudioFileException e1) {
 						showError("Severe error while setting audio mixer", null);
 					} catch (TriggerException e2) {
@@ -923,6 +1043,60 @@ public class MainFrame extends JFrame {
 			JDialog d = mixerChooser();
 		}
 	};
-	private JPanel panel;
-	private JButton btnAddPlugin;
+	
+	
+	private ActionListener launchShow = new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			main.initShow(sceneList);
+		}
+	};
+	
+	private ActionListener saveSettings = new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			final JFileChooser fc = new JFileChooser();
+//			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			
+			int val = fc.showSaveDialog(null);
+			
+			if(val == JFileChooser.APPROVE_OPTION) {
+				showError("Save not implemented", null);
+//				try {
+//					File f = new File(fc.getSelectedFile().getAbsolutePath().concat(".s1"));//custom suffix
+//					
+//					
+//					FileWriter fw = new FileWriter(f);
+//					fw.write("xxx");
+//					fw.flush();
+//					fw.close();
+//				}catch (UnsupportedEncodingException e2) {
+//					showError("Improper encoding", null);
+//				} catch (IOException e1) {
+//					showError("IO Exception occured", null);
+//				}
+				
+			}
+		}
+	};
+	
+	private ActionListener loadSettings = new ActionListener() {
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			final JFileChooser fc = new JFileChooser();
+			
+			int val = fc.showOpenDialog(null);
+			
+			if(val == JFileChooser.APPROVE_OPTION) {
+				showError("Save not implemented", null);
+//				File f = fc.getSelectedFile();
+//				
+//				reloadDisplayComponents();
+			}
+		}
+	};
 }

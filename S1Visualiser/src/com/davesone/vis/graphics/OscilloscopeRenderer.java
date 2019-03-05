@@ -8,13 +8,14 @@ import com.davesone.vis.audio.AudioProcessorHandler;
 import com.davesone.vis.audio.AudioStreamHandler;
 import com.davesone.vis.core.Debug;
 import com.davesone.vis.triggers.TriggerException;
+import com.davesone.vis.triggers.TriggerHandler;
 
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.Oscilloscope;
 import be.tarsos.dsp.Oscilloscope.OscilloscopeEventHandler;
 
-public class OscilloscopeRenderer extends AudioProcessorHandler implements OscilloscopeEventHandler{
+public class OscilloscopeRenderer extends TriggerHandler implements OscilloscopeEventHandler{
 	
 	private float data[];
 	private Component parentDisplay;
@@ -38,7 +39,7 @@ public class OscilloscopeRenderer extends AudioProcessorHandler implements Oscil
 	}
 	
 	public void render(Graphics g, Component c) {
-		g.setColor(Color.BLACK);
+//		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, c.getWidth(), c.getHeight());
 		g.setColor(Color.white);
 		if(data != null) {

@@ -23,6 +23,8 @@ public class AudioStreamHandler {
 	private AudioDispatcher dispatcher;//will be used to feed processors
 	private Mixer mixer;
 	
+	private Thread dispatchThread;
+	
 	public float sampleRate = Values.sampleRate;
 	public int bufferSize = Values.bufferSize, bufferOverlap = Values.bufferOverlap;
 	
@@ -66,22 +68,27 @@ public class AudioStreamHandler {
 		JVMAudioInputStream audioStream = new JVMAudioInputStream(stream);
 		// create a new dispatcher
 		dispatcher = new AudioDispatcher(audioStream, bufferSize, bufferOverlap);
-
+		
 		// run the dispatcher (on a new thread).
-		new Thread(dispatcher,"Audio dispatching").start();
+		dispatchThread = new Thread(dispatcher,"Audio dispatching");
+		dispatchThread.start();
 	}
 	
 	public AudioDispatcher getDispatcher() {
 		return dispatcher;
 	}
 	
+	//TODO probably not needed
+	public void setDispatcher(AudioDispatcher d) {
+		dispatcher = d;
+	}
+		
 	public Mixer getMixer() {
 		return mixer;
 	}
 	
-	//TODO probably not needed
-	public void setDispatcher(AudioDispatcher d) {
-		dispatcher = d;
+	public Thread getDispatchThread() {
+		return dispatchThread;
 	}
 	
 	public String getStreamSource() {

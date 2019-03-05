@@ -2,6 +2,9 @@ package com.davesone.vis.triggers;
 
 import java.util.ArrayList;
 
+import com.davesone.vis.ui.TriggerablePanel;
+import com.davesone.vis.video.elements.Element;
+
 /**
  * A thread that simply checks if a trigger has been sent, and then
  * invokes any required trigger actions
@@ -10,27 +13,47 @@ import java.util.ArrayList;
  */
 public class TriggerThread implements Runnable{
 	
-	public boolean running;
-	private Thread tThread;
-	private ArrayList<Element> triggerable;
+	private Thread listeningThread;
+	private TriggerablePanel targetPanel;//Panel showing trigger updates
+	private Trigger trigger;
+	private ArrayList<Element> triggerList;
+	private boolean visualOnly = false;
 
+	public TriggerThread(Trigger t, TriggerablePanel p) {
+		listeningThread = new Thread(this, "Trigger listening thread");
+		visualOnly = true;
+		targetPanel = p;
+		trigger = t;
+		trigger.setListeningThread(listeningThread);
+	}
+	
 	/**
 	 * Init the thread, running must be set to true before thread will start
 	 * @param triggerableList
 	 */
 	public TriggerThread(ArrayList<Element> triggerableList) {
-		triggerable = triggerableList;
-		tThread = new Thread(this, "Trigger listening thread");
+		triggerList = triggerableList;
+		listeningThread = new Thread(this, "Trigger listening thread");
 	}
 	
 	@Override
 	public void run() {//TODO this thread is not synced with video thread, so triggers might end up a bit funny in timing
-		while(running) {
-			for(Element t : triggerable) {
-				if(t.getTrigger().isTriggered()) {
-					t.getTriggerAction().onTrigger();
-					t.getTrigger().resetTrigger();
+		while(true) {
+			if(visualOnly) {
+				synchronized (trigger.getListeningThread()) {
+					try {
+						trigger.getListeningThread().wait();
+						targetPanel.triggerDisplay();
+//						}
+					}catch (InterruptedException e) {e.printStackTrace();}
 				}
+			}else{
+//				for(Element t : triggerList) {
+//					if(t.getTrigger().isTriggered()) {
+//						t.getTriggerAction().onTrigger();
+//						t.getTrigger().resetTrigger();//TODO timeouts etc
+//					}
+//				}
 			}
 		}
 	}
@@ -39,7 +62,14 @@ public class TriggerThread implements Runnable{
 	 * Call when a change to the list of triggerable objects is needed
 	 */
 	public void updateTriggerableList(ArrayList<Element> t) {
-		triggerable = t;
+		triggerList = t;
+	}
+	
+	public Trigger getTrigger() throws TriggerException{
+		if(trigger == null) {
+			throw new TriggerException("No single trigger set");
+		}
+		return trigger;
 	}
 	
 	/**
@@ -47,7 +77,15 @@ public class TriggerThread implements Runnable{
 	 * @return the listening thread
 	 */
 	public Thread getThread() {
-		return tThread;
+		return listeningThread;
+	}
+	
+	/**
+	 * Returns the listening thread belonging to the trigger
+	 * @return
+	 */
+	public Thread getTriggerListeningThread() {
+		return trigger.getListeningThread();
 	}
 
 }

@@ -16,13 +16,12 @@ public class Debug {
 	}
 	
 	public static void printMessage(String s, Object... args) {
-		String classname = Thread.currentThread().getStackTrace()[2].getClassName();
-		System.out.println("[" + classname + "]");
-		System.out.printf(s, args);
+		String classname = "\n[".concat(Thread.currentThread().getStackTrace()[2].getClassName()).concat("] ");
+		System.out.printf(classname.concat(s), args);
 	}
 	
 	public static void printError(String s) {
 		String classname = Thread.currentThread().getStackTrace()[2].getClassName();
-		System.out.println("[" + classname + "]" + s);
+		System.err.println("[" + classname + "]" + s);
 	}
 }

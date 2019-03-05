@@ -2,7 +2,7 @@ package com.davesone.vis.video;
 
 import com.davesone.vis.core.Debug;
 
-public class FrameBasedVideoThread implements Runnable{
+public class VideoThread implements Runnable{
 	
 	private Thread mainThread;
 	
@@ -12,14 +12,12 @@ public class FrameBasedVideoThread implements Runnable{
 	private int fps = 0, ticks = 0;//Used to get current frames and ticks
 	private long totalTicks = 0;
 	
-	public boolean running;
+	public boolean running = false;
 	
-	public FrameBasedVideoThread(int frameWidth, int frameHeight) {
+	public VideoThread(int frameWidth, int frameHeight) {
 		
 		mainCanvas = new MarvinPanelCanvas(frameWidth, frameHeight);
-		mainCanvas.initFrameletThread();
 		mainThread = new Thread(this, "Master Video Thread");
-		
 	}
 
 	@Override
@@ -70,6 +68,10 @@ public class FrameBasedVideoThread implements Runnable{
 				}
 			}
 		}
+	}
+	
+	public MarvinPanelCanvas getCanvas() {
+		return mainCanvas;
 	}
 	
 	public Thread getThread() {
