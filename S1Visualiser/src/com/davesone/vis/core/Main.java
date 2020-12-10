@@ -1,9 +1,7 @@
 package com.davesone.vis.core;
 
-import org.marvinproject.image.test.plugin.Plugin;
-
 import com.davesone.vis.audio.AudioInputManager;
-import com.davesone.vis.triggers.TriggerThread;
+import com.davesone.vis.triggers.Trigger;
 import com.davesone.vis.ui.MainFrame;
 import com.davesone.vis.video.plugins.PluginLoader;
 
@@ -33,7 +31,7 @@ public class Main {
 	 * Init the show, to be called from main frame
 	 */
 	public void initShow(TextAndObjectList<Scene> sceneList) {
-		showManager = new ShowManager(sceneList);
+		showManager = new ShowManager(sceneList, audioManager);
 	}
 	
 	public AudioInputManager getAudioManager() {

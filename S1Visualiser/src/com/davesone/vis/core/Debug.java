@@ -12,7 +12,7 @@ public class Debug {
 	
 	public static void printMessage(String s) {
 		String classname = Thread.currentThread().getStackTrace()[2].getClassName();
-		System.out.println("[" + classname + "]" + s);
+		System.out.println("\n[" + classname + "]" + s);
 	}
 	
 	public static void printMessage(String s, Object... args) {

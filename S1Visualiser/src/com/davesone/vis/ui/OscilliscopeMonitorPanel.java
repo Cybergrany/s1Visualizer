@@ -10,12 +10,13 @@ import com.davesone.vis.audio.AudioStreamHandler;
 import com.davesone.vis.graphics.OscilloscopeRenderer;
 import com.davesone.vis.triggers.TriggerException;
 import com.davesone.vis.triggers.TriggerThread;
+import com.davesone.vis.triggers.Triggerable;
 
-public class OscilliscopeMonitorPanel extends JPanel implements TriggerablePanel{
+public class OscilliscopeMonitorPanel extends JPanel implements Triggerable{
 
+	private static final long serialVersionUID = 387986032364795336L;
 	private OscilloscopeRenderer oscilliscope;
 	private boolean initialized = false, triggerHit = false;
-	private int triggerCount = 0, maxCounts = 2;
 	
 	
 	public OscilliscopeMonitorPanel() {
@@ -64,7 +65,7 @@ public class OscilliscopeMonitorPanel extends JPanel implements TriggerablePanel
 		return initialized;
 	}
 	
-	public void triggerDisplay() {
+	public void triggerObject() {
 		triggerHit = true;
 		repaint();
 	}

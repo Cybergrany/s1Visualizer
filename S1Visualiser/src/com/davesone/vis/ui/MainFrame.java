@@ -582,7 +582,7 @@ public class MainFrame extends JFrame {
 //		Trigger currentTrigger;
 		
 		try {//If trigger already set
-			currentTrigger = main.getAudioManager().getListeningThread().getTrigger();
+			currentTrigger = main.getAudioManager().getListeningTriggerThread().getTrigger();
 			triggerList.setSelectedIndex(currentTriggerIndex);
 		}catch (TriggerException e) {
 			currentTrigger = UIWrapperManager.stringToTrigger(triggerList.getItemAt(triggerList.getSelectedIndex()));
@@ -618,8 +618,8 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 //					main.getAudioManager().setProcessor(currentTrigger);
-					main.getAudioManager().setListeningThread(new TriggerThread(currentTrigger, oscilliscopePanel));
-					oscilliscopePanel.setListeningThread(main.getAudioManager().getListeningThread());
+					main.getAudioManager().setListeningTriggerThread(new TriggerThread(currentTrigger, oscilliscopePanel));
+					oscilliscopePanel.setListeningThread(main.getAudioManager().getListeningTriggerThread());
 				} catch (TriggerException e1) {
 					showError("Error setting triggerThread", null);
 				}
@@ -1029,6 +1029,10 @@ public class MainFrame extends JFrame {
 						showError("Severe error while setting audio mixer", null);
 					} catch (TriggerException e2) {
 						showError("Failed to start visual audio monitoring", null);
+					} catch(IllegalArgumentException e3) {
+						showError("This input is not supported, see logs for more information.", null);
+//						Debug.printError(e3.getStackTrace().toString());
+						Debug.printError("Ïnput not supported, see MainFrame for stack trace access.");
 					}
 					break;
 				}

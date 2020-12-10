@@ -1,10 +1,12 @@
 package com.davesone.vis.video;
 
 import com.davesone.vis.core.Debug;
+import com.davesone.vis.core.VideoManager;
 
 public class VideoThread implements Runnable{
 	
 	private Thread mainThread;
+	private VideoManager manager;
 	
 	public MarvinPanelCanvas mainCanvas;
 	
@@ -14,7 +16,8 @@ public class VideoThread implements Runnable{
 	
 	public boolean running = false;
 	
-	public VideoThread(int frameWidth, int frameHeight) {
+	public VideoThread(VideoManager m, int frameWidth, int frameHeight) {
+		manager = m;
 		
 		mainCanvas = new MarvinPanelCanvas(frameWidth, frameHeight);
 		mainThread = new Thread(this, "Master Video Thread");
@@ -34,9 +37,10 @@ public class VideoThread implements Runnable{
 			while (running) {
 				if (System.currentTimeMillis() - lastTimer >= 1000) {
 //					if(printFPS) {
-						//Print the current fps and tps if printFPS is true
-						Debug.printMessage("%d ticks, %d fps\n", ticks, fps);
+						//Print the current fps and tps if printFPS is true 
+//						Debug.printMessage("%d ticks, %d fps\n", ticks, fps);/*fps NOW SHOWN ON MAIN SCREEN*/
 //					}
+					manager.getShowManager().getVideoControlFrame().updateStatusBar(fps + " fps");
 					lastTimer = System.currentTimeMillis();
 					ticks = fps = 0;
 				}
@@ -76,5 +80,9 @@ public class VideoThread implements Runnable{
 	
 	public Thread getThread() {
 		return mainThread;
+	}
+	
+	public int getFps() {
+		return fps;
 	}
 }

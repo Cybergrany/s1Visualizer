@@ -54,14 +54,14 @@ public class AudioInputManager {
 		apHandler.refreshAudioProcessor(t.getHandler());
 	}
 	
-	public TriggerThread getListeningThread() throws TriggerException{
+	public TriggerThread getListeningTriggerThread() throws TriggerException{
 		if(listeningThread == null) {
 			throw new TriggerException("Thread not initialized");
 		}
 		return listeningThread;
 	}
 	
-	public void setListeningThread(TriggerThread t) throws TriggerException{
+	public void setListeningTriggerThread(TriggerThread t) throws TriggerException{
 		listeningThread = t;
 		setProcessor(t.getTrigger());
 		listeningThread.getThread().start();

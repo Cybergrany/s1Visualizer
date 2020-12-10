@@ -5,6 +5,7 @@ import java.awt.GraphicsEnvironment;
 
 import javax.swing.JFrame;
 
+import com.davesone.vis.core.ShowManager;
 import com.davesone.vis.core.VideoManager;
 
 /***
@@ -26,11 +27,11 @@ public class VideoOutputFrame extends JFrame{
 	 * @param w
 	 * @param h
 	 */
-	public VideoOutputFrame(int w, int h) {
+	public VideoOutputFrame(ShowManager m, int w, int h) {
 		super("S1 Visualiser");
 		setSize(w, h);
 		
-		manager = new VideoManager();
+		manager = new VideoManager(m);
 		manager.initThread(w, h);
 		
 		device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
@@ -41,6 +42,10 @@ public class VideoOutputFrame extends JFrame{
 		setVisible(true);
 	}
 	
+	/**
+	 * TODO don't think this needs to be exposed
+	 * @return
+	 */
 	public VideoManager getManager() {
 		return manager;
 	}

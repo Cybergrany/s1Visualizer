@@ -2,15 +2,13 @@ package com.davesone.vis.core;
 
 import java.util.ArrayList;
 
-import org.marvinproject.image.test.plugin.Plugin;
-
-import com.davesone.vis.triggers.TriggerThread;
+import com.davesone.vis.audio.AudioInputManager;
+import com.davesone.vis.ui.VideoOutputControlFrame;
 import com.davesone.vis.ui.VideoOutputFrame;
 import com.davesone.vis.video.PluginCompatible;
 import com.davesone.vis.video.elements.Element;
-import com.davesone.vis.video.elements.VideoFramelet;
 import com.davesone.vis.video.elements.Element.elementFlavour;
-import com.davesone.vis.video.plugins.PluginContainer;
+import com.davesone.vis.video.elements.VideoFramelet;
 
 /**
  * Class that handles all threads and programs needed to display the main show
@@ -20,19 +18,24 @@ import com.davesone.vis.video.plugins.PluginContainer;
 public class ShowManager {
 	
 	private VideoOutputFrame showFrame;
+	private VideoOutputControlFrame controlFrame;
+	private AudioInputManager audioManager;
+	private VideoManager videoManager;
 	private TextAndObjectList<Scene> scenes;//List of all scenes
 	private int currentScene = 0;
 	
-	public ShowManager(TextAndObjectList<Scene> scenes) {
-		this.scenes = scenes;
+	public ShowManager(TextAndObjectList<Scene> scenes, AudioInputManager audioManager) {
 		Debug.printMessage("\n\nStarting a new show...");
+		this.scenes = scenes;
+		this.audioManager = audioManager;
 		printSceneContents();
 		initShow();
 		startShow();//TODO Call from manager window
 	}
 	
 	public void initShow() {
-		showFrame = new VideoOutputFrame(Values.defaultShowWindowSize.width, Values.defaultShowWindowSize.height);
+		controlFrame = new VideoOutputControlFrame(this);
+		showFrame = new VideoOutputFrame(this, Values.defaultShowWindowSize.width, Values.defaultShowWindowSize.height);
 		
 		ArrayList<VideoFramelet> framelets = new ArrayList<>();
 		for(Element e : scenes.getElement(currentScene).getElementList().getElements()) {
@@ -43,6 +46,8 @@ public class ShowManager {
 		}
 		if(!framelets.isEmpty())
 		showFrame.getManager().getCanvas().initFramelets(framelets);
+		
+		videoManager = showFrame.getManager();
 	}
 	
 	/**
@@ -50,6 +55,10 @@ public class ShowManager {
 	 */
 	public void startShow() {
 		showFrame.getManager().startThread();
+	}
+	
+	public VideoOutputControlFrame getVideoControlFrame() {
+		return controlFrame;
 	}
 	
 	private void printSceneContents() {

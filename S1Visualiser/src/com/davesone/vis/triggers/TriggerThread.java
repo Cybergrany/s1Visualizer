@@ -2,7 +2,6 @@ package com.davesone.vis.triggers;
 
 import java.util.ArrayList;
 
-import com.davesone.vis.ui.TriggerablePanel;
 import com.davesone.vis.video.elements.Element;
 
 /**
@@ -14,12 +13,12 @@ import com.davesone.vis.video.elements.Element;
 public class TriggerThread implements Runnable{
 	
 	private Thread listeningThread;
-	private TriggerablePanel targetPanel;//Panel showing trigger updates
+	private Triggerable targetPanel;//Panel showing trigger updates
 	private Trigger trigger;
 	private ArrayList<Element> triggerList;
 	private boolean visualOnly = false;
 
-	public TriggerThread(Trigger t, TriggerablePanel p) {
+	public TriggerThread(Trigger t, Triggerable p) {
 		listeningThread = new Thread(this, "Trigger listening thread");
 		visualOnly = true;
 		targetPanel = p;
@@ -43,7 +42,7 @@ public class TriggerThread implements Runnable{
 				synchronized (trigger.getListeningThread()) {
 					try {
 						trigger.getListeningThread().wait();
-						targetPanel.triggerDisplay();
+						targetPanel.triggerObject();
 //						}
 					}catch (InterruptedException e) {e.printStackTrace();}
 				}
